@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-import asyncio
-from typing import ClassVar
 from collections.abc import AsyncGenerator
 from pathlib import Path
+from typing import ClassVar
 
 from pydantic import BaseModel, Field
 
-from vibe.core.tools.lsp.base_lsp_tool import BaseLSPTool, LSPToolConfig, LSPToolState
+from vibe.core.tools.base import InvokeContext, ToolError
+from vibe.core.tools.lsp.base_lsp_tool import BaseLSPTool
 from vibe.core.types import ToolStreamEvent
 
 
@@ -28,9 +28,7 @@ class GoToDefinitionResult(BaseModel):
     symbol_name: str = Field(description="Name of the symbol defined")
 
 
-class GoToDefinition(
-    BaseLSPTool[GoToDefinitionArgs, GoToDefinitionResult, LSPToolConfig, LSPToolState]
-):
+class GoToDefinition(BaseLSPTool[GoToDefinitionArgs, GoToDefinitionResult]):
     """Navigate to the definition of a symbol using LSP."""
 
     description: ClassVar[str] = (
@@ -44,12 +42,10 @@ class GoToDefinition(
         try:
             server_process = await self._ensure_server_running(args.file_path)
 
-            # Create request parameters
             params = self._create_position_params(
                 args.file_path, args.line, args.character
             )
 
-            # Send request to LSP server
             response = await server_process.request("textDocument/definition", params)
 
             if not response:
@@ -57,18 +53,32 @@ class GoToDefinition(
                     "No definition found for the symbol at the specified location."
                 )
 
-            # Process first location (LSP can return multiple locations)
-            location = response[0] if isinstance(response, list) else response
+            if isinstance(response, list):
+                if not response:
+                    raise ToolError(
+                        "No definition found for the symbol at the specified location."
+                    )
+                location = response[0]
+            elif isinstance(response, dict):
+                location = response
+            else:
+                raise ToolError(
+                    "Invalid LSP response: expected location or list of locations."
+                )
+
+            if not isinstance(location, dict) or "uri" not in location:
+                raise ToolError("Invalid location format in LSP response.")
+
             target_uri = location["uri"]
             target_path = str(Path(target_uri).resolve())
 
-            # Read context around the definition
-            context = self._read_context_around_position(
+            context = await self._read_context_around_position(
                 target_path, location["range"]["start"]["line"], args.context_lines
             )
 
-            # Extract symbol name from context
-            symbol_name = self._extract_symbol_name(context)
+            symbol_name = await self._extract_symbol_name(
+                target_path, location["range"]["start"]["line"]
+            )
 
             yield GoToDefinitionResult(
                 file_path=target_path,
@@ -78,55 +88,7 @@ class GoToDefinition(
                 symbol_name=symbol_name,
             )
 
+        except ToolError:
+            raise
         except Exception as e:
             await self._handle_lsp_error(e, "go to definition")
-
-    async def _read_context_around_position(
-        self, file_path: str, line: int, context_lines: int
-    ) -> str:
-        """Read code context around a specific line in a file."""
-        try:
-            lines = await asyncio.to_thread(self._read_file_lines, file_path)
-
-            # Calculate start and end lines
-            start_line = max(0, line - context_lines)
-            end_line = min(len(lines), line + context_lines + 1)
-
-            # Extract context lines
-            context_lines_content = lines[start_line:end_line]
-
-            # Add line numbers
-            result = []
-            for i, context_line in enumerate(
-                context_lines_content, start=start_line + 1
-            ):
-                marker = ">>>" if i == line + 1 else "   "  # Mark the definition line
-                result.append(f"{marker} {i:4d}: {context_line.rstrip()}")
-
-            return "\n".join(result)
-
-        except Exception as e:
-            return f"Unable to read context: {str(e)}"
-
-    def _read_file_lines(self, file_path: str) -> list[str]:
-        """Read all lines from a file (runs in thread pool)."""
-        with open(file_path, "r", encoding="utf-8") as f:
-            return f.readlines()
-
-    async def _extract_symbol_name(self, context: str) -> str:
-        """Extract symbol name from context."""
-        # Simple heuristic: look for common definition patterns
-        lines = context.split("\n")
-        for line in lines:
-            if ">>>" in line:  # This is the definition line
-                # Look for common definition patterns
-                if "def " in line:
-                    return line.split("def ")[1].split("(")[0].strip()
-                elif "class " in line:
-                    return line.split("class ")[1].split(":")[0].split("(")[0].strip()
-                elif "=" in line:
-                    return line.split("=")[0].strip()
-                elif ":" in line:
-                    return line.split(":")[0].strip()
-
-        return "unknown"

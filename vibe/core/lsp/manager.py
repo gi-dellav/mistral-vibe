@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
+import threading
 from typing import Any
 
 from multilspy import LanguageServer
@@ -44,6 +46,7 @@ class LSPManager:
         self.config = config
         self.servers: dict[str, LanguageServer] = {}
         self.workspace_roots: dict[str, Path] = {}
+        self._lock = asyncio.Lock()
 
     def _get_language_for_file(self, file_path: str) -> str | None:
         """Get the language identifier for a file based on its extension."""
@@ -53,6 +56,11 @@ class LSPManager:
     def _find_workspace_root(self, file_path: str) -> Path:
         """Find the workspace root for a file."""
         file_path_obj = Path(file_path).resolve()
+        resolved_path = str(file_path_obj)
+
+        if resolved_path in self.workspace_roots:
+            return self.workspace_roots[resolved_path]
+
         parent = file_path_obj.parent
 
         while parent != parent.parent:
@@ -67,11 +75,11 @@ class LSPManager:
                 "go.mod",
             ]:
                 if (parent / marker).exists():
-                    self.workspace_roots[str(file_path_obj)] = parent
+                    self.workspace_roots[resolved_path] = parent
                     return parent
             parent = parent.parent
 
-        self.workspace_roots[str(file_path_obj)] = file_path_obj.parent
+        self.workspace_roots[resolved_path] = file_path_obj.parent
         return file_path_obj.parent
 
     async def ensure_server_for_file(self, file_path: str) -> LanguageServer:
@@ -88,12 +96,13 @@ class LSPManager:
         workspace_root = self._find_workspace_root(file_path)
         server_key = f"{language}:{workspace_root}"
 
-        if server_key not in self.servers:
-            lsp_config = MultilspyConfig.from_dict({"code_language": language})
-            lsp_logger = MultilspyLogger()
+        async with self._lock:
+            if server_key not in self.servers:
+                lsp_config = MultilspyConfig.from_dict({"code_language": language})
+                lsp_logger = MultilspyLogger()
 
-            lsp = LanguageServer.create(lsp_config, lsp_logger, str(workspace_root))
-            self.servers[server_key] = lsp
+                lsp = LanguageServer.create(lsp_config, lsp_logger, str(workspace_root))
+                self.servers[server_key] = lsp
 
         return self.servers[server_key]
 
@@ -108,7 +117,8 @@ class LSPManager:
                 text_document_uri = Path(file_path).as_uri()
 
                 params = {"textDocument": {"uri": text_document_uri}}
-                response = await lsp.server.send.text_document_diagnostic(params)  # type: ignore[arg-type]
+                # multilspy's send method doesn't have typed params; LSP accepts dict
+                response = await lsp.server.send.text_document_diagnostic(params)  # type: ignore[arg-type]  # multilspy uses dynamic typing
 
                 diagnostics = self._parse_diagnostic_report(response, file_path)
 
@@ -232,29 +242,43 @@ class LSPManager:
 
     async def shutdown(self) -> None:
         """Shutdown all LSP servers."""
-        for server in self.servers.values():
-            try:
-                await server.server.stop()
-            except Exception as e:
-                logger.warning(f"Error stopping LSP server: {e}")
-        self.servers.clear()
+        async with self._lock:
+            for server in self.servers.values():
+                try:
+                    await server.server.stop()
+                except Exception as e:
+                    logger.warning(f"Error stopping LSP server: {e}")
+            self.servers.clear()
 
 
 _lsp_manager: LSPManager | None = None
+_lsp_manager_lock = threading.Lock()
 
 
-def get_lsp_manager() -> LSPManager:
-    """Get the global LSP manager instance."""
+def get_lsp_manager(config: LSPConfig | None = None) -> LSPManager:
+    """Get the global LSP manager instance.
+
+    Args:
+        config: Optional LSP config to use. If not provided, uses existing manager
+               or creates a new one with default config.
+
+    Note: When running in app mode, the config should be passed from VibeConfig.lsp
+          to ensure user settings are respected. This requires integration with
+          the ToolManager's config_getter pattern.
+    """
     global _lsp_manager
-    if _lsp_manager is None:
-        lsp_config = get_default_lsp_config()
-        _lsp_manager = LSPManager(lsp_config)
+    with _lsp_manager_lock:
+        if _lsp_manager is None:
+            _lsp_manager = LSPManager(config or get_default_lsp_config())
+        elif config is not None:
+            _lsp_manager.config = config
     return _lsp_manager
 
 
 async def shutdown_lsp_manager() -> None:
     """Shutdown the global LSP manager."""
     global _lsp_manager
-    if _lsp_manager:
-        await _lsp_manager.shutdown()
-        _lsp_manager = None
+    with _lsp_manager_lock:
+        if _lsp_manager:
+            await _lsp_manager.shutdown()
+            _lsp_manager = None

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import ClassVar
 from collections.abc import AsyncGenerator
-from pathlib import Path
+from typing import ClassVar
 
 from pydantic import BaseModel, Field
 
-from vibe.core.tools.lsp.base_lsp_tool import BaseLSPTool, LSPToolConfig, LSPToolState
-from vibe.core.lsp.config import Diagnostic, PostEditDiagnosticsResult
+from vibe.core.lsp.config import PostEditDiagnosticsResult
+from vibe.core.tools.base import InvokeContext
+from vibe.core.tools.lsp.base_lsp_tool import BaseLSPTool
 from vibe.core.types import ToolStreamEvent
 
 
@@ -19,9 +19,7 @@ class PostEditDiagnosticsArgs(BaseModel):
 
 
 class PostEditDiagnostics(
-    BaseLSPTool[
-        PostEditDiagnosticsArgs, PostEditDiagnosticsResult, LSPToolConfig, LSPToolState
-    ]
+    BaseLSPTool[PostEditDiagnosticsArgs, PostEditDiagnosticsResult]
 ):
     """Check for LSP diagnostics after a file edit."""
 
