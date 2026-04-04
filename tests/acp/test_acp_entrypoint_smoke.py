@@ -99,7 +99,7 @@ async def _terminate_process(proc: asyncio.subprocess.Process) -> None:
 def _build_env(vibe_home_dir: Path, *, include_api_key: bool) -> dict[str, str]:
     env = os.environ.copy()
     env["PYTHONUNBUFFERED"] = "1"
-    env["VIBE_HOME"] = str(vibe_home_dir)
+    env["GLIDER_HOME"] = str(vibe_home_dir)
 
     if include_api_key:
         env["MISTRAL_API_KEY"] = "mock"
@@ -154,8 +154,8 @@ async def test_vibe_acp_initialize_and_new_session(vibe_home_dir: Path) -> None:
 
     try:
         assert initialize_response.protocol_version == PROTOCOL_VERSION
-        assert initialize_response.agent_info.name == "@mistralai/mistral-vibe"
-        assert initialize_response.agent_info.title == "Mistral Vibe"
+        assert initialize_response.agent_info.name == "@mistralai/glider-code"
+        assert initialize_response.agent_info.title == "Glider for Mistral"
 
         session = await asyncio.wait_for(
             conn.new_session(cwd=str(Path.cwd()), mcp_servers=[]), timeout=10
@@ -199,7 +199,7 @@ async def test_vibe_acp_initialize_exposes_terminal_auth_when_supported(
         assert auth_method.field_meta is not None
 
         terminal_auth = auth_method.field_meta["terminal-auth"]
-        assert terminal_auth["label"] == "Mistral Vibe Setup"
+        assert terminal_auth["label"] == "Glider for Mistral Setup"
         assert terminal_auth["command"]
         assert terminal_auth["args"]
     finally:
@@ -226,7 +226,7 @@ def test_vibe_acp_setup_shows_onboarding_and_exits_on_cancel(
     child.logfile_read = captured
 
     try:
-        child.expect(ansi_tolerant_pattern("Welcome to Mistral Vibe"), timeout=10)
+        child.expect(ansi_tolerant_pattern("Welcome to Glider for Mistral"), timeout=10)
         child.sendcontrol("c")
         child.expect(pexpect.EOF, timeout=10)
     finally:

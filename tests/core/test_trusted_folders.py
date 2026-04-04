@@ -7,8 +7,8 @@ from unittest.mock import patch
 import pytest
 import tomli_w
 
-from vibe.core.paths import AGENTS_MD_FILENAME, TRUSTED_FOLDERS_FILE
-from vibe.core.trusted_folders import (
+from glider.core.paths import AGENTS_MD_FILENAME, TRUSTED_FOLDERS_FILE
+from glider.core.trusted_folders import (
     TrustedFoldersManager,
     has_agents_md_file,
     has_trustable_content,
@@ -312,7 +312,7 @@ class TestHasAgentsMdFile:
 
     def test_returns_false_when_only_other_files_exist(self, tmp_path: Path) -> None:
         (tmp_path / "README.md").write_text("", encoding="utf-8")
-        (tmp_path / ".vibe").mkdir()
+        (tmp_path / ".glider").mkdir()
         assert has_agents_md_file(tmp_path) is False
 
     def test_agents_md_filename_constant(self) -> None:
@@ -321,7 +321,7 @@ class TestHasAgentsMdFile:
 
 class TestHasTrustableContent:
     def test_returns_true_when_vibe_dir_exists(self, tmp_path: Path) -> None:
-        (tmp_path / ".vibe" / "skills").mkdir(parents=True)
+        (tmp_path / ".glider" / "skills").mkdir(parents=True)
         assert has_trustable_content(tmp_path) is True
 
     def test_returns_true_when_agents_dir_exists(self, tmp_path: Path) -> None:
@@ -337,8 +337,8 @@ class TestHasTrustableContent:
         (tmp_path / "other.txt").write_text("", encoding="utf-8")
         assert has_trustable_content(tmp_path) is False
 
-    def test_returns_true_when_vibe_config_in_subfolder(self, tmp_path: Path) -> None:
-        (tmp_path / "sub" / ".vibe" / "skills").mkdir(parents=True)
+    def test_returns_true_when_glider_config_in_subfolder(self, tmp_path: Path) -> None:
+        (tmp_path / "sub" / ".glider" / "skills").mkdir(parents=True)
         assert has_trustable_content(tmp_path) is True
 
     def test_returns_true_when_agents_skills_in_subfolder(self, tmp_path: Path) -> None:
@@ -348,5 +348,5 @@ class TestHasTrustableContent:
     def test_returns_false_when_config_only_inside_ignored_dir(
         self, tmp_path: Path
     ) -> None:
-        (tmp_path / "node_modules" / ".vibe" / "skills").mkdir(parents=True)
+        (tmp_path / "node_modules" / ".glider" / "skills").mkdir(parents=True)
         assert has_trustable_content(tmp_path) is False

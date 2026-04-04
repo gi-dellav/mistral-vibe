@@ -1,35 +1,35 @@
-id = "mistral-vibe"
-name = "Mistral Vibe"
+id = "glider-code"
+name = "Glider for Mistral"
 description = "Mistral's open-source coding assistant"
 version = "2.7.3"
 schema_version = 1
 authors = ["Mistral AI"]
-repository = "https://github.com/mistralai/mistral-vibe"
+repository = "https://github.com/mistralai/glider-code"
 
-[agent_servers.mistral-vibe]
-name = "Mistral Vibe"
-icon = "./icons/mistral_vibe.svg"
+[agent_servers.glider-code]
+name = "Glider for Mistral"
+icon = "./icons/glider_code.svg"
 
-[agent_servers.mistral-vibe.targets.darwin-aarch64]
-archive = "https://github.com/mistralai/mistral-vibe/releases/download/v2.7.3/vibe-acp-darwin-aarch64-2.7.3.zip"
-cmd = "./vibe-acp"
+[agent_servers.glider-code.targets.darwin-aarch64]
+archive = "https://github.com/mistralai/glider-code/releases/download/v2.7.3/glider-acp-darwin-aarch64-2.7.3.zip"
+cmd = "./glider-acp"
 
-[agent_servers.mistral-vibe.targets.darwin-x86_64]
-archive = "https://github.com/mistralai/mistral-vibe/releases/download/v2.7.3/vibe-acp-darwin-x86_64-2.7.3.zip"
-cmd = "./vibe-acp"
+[agent_servers.glider-code.targets.darwin-x86_64]
+archive = "https://github.com/mistralai/glider-code/releases/download/v2.7.3/glider-acp-darwin-x86_64-2.7.3.zip"
+cmd = "./glider-acp"
 
-[agent_servers.mistral-vibe.targets.linux-aarch64]
-archive = "https://github.com/mistralai/mistral-vibe/releases/download/v2.7.3/vibe-acp-linux-aarch64-2.7.3.zip"
-cmd = "./vibe-acp"
+[agent_servers.glider-code.targets.linux-aarch64]
+archive = "https://github.com/mistralai/glider-code/releases/download/v2.7.3/glider-acp-linux-aarch64-2.7.3.zip"
+cmd = "./glider-acp"
 
-[agent_servers.mistral-vibe.targets.linux-x86_64]
-archive = "https://github.com/mistralai/mistral-vibe/releases/download/v2.7.3/vibe-acp-linux-x86_64-2.7.3.zip"
-cmd = "./vibe-acp"
+[agent_servers.glider-code.targets.linux-x86_64]
+archive = "https://github.com/mistralai/glider-code/releases/download/v2.7.3/glider-acp-linux-x86_64-2.7.3.zip"
+cmd = "./glider-acp"
 
-[agent_servers.mistral-vibe.targets.windows-aarch64]
-archive = "https://github.com/mistralai/mistral-vibe/releases/download/v2.7.3/vibe-acp-windows-aarch64-2.7.3.zip"
-cmd = "./vibe-acp.exe"
+[agent_servers.glider-code.targets.windows-aarch64]
+archive = "https://github.com/mistralai/glider-code/releases/download/v2.7.3/glider-acp-windows-aarch64-2.7.3.zip"
+cmd = "./glider-acp.exe"
 
-[agent_servers.mistral-vibe.targets.windows-x86_64]
-archive = "https://github.com/mistralai/mistral-vibe/releases/download/v2.7.3/vibe-acp-windows-x86_64-2.7.3.zip"
-cmd = "./vibe-acp.exe"
+[agent_servers.glider-code.targets.windows-x86_64]
+archive = "https://github.com/mistralai/glider-code/releases/download/v2.7.3/glider-acp-windows-x86_64-2.7.3.zip"
+cmd = "./glider-acp.exe"

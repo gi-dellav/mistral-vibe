@@ -6,16 +6,16 @@ from unittest.mock import MagicMock
 import pytest
 
 from tests.mock.utils import collect_result
-from vibe.core.skills.manager import SkillManager
-from vibe.core.skills.models import SkillInfo
-from vibe.core.tools.base import BaseToolState, InvokeContext, ToolError
-from vibe.core.tools.builtins.skill import (
+from glider.core.skills.manager import SkillManager
+from glider.core.skills.models import SkillInfo
+from glider.core.tools.base import BaseToolState, InvokeContext, ToolError
+from glider.core.tools.builtins.skill import (
     Skill,
     SkillArgs,
     SkillResult,
     SkillToolConfig,
 )
-from vibe.core.tools.permissions import PermissionScope
+from glider.core.tools.permissions import PermissionScope
 
 
 def _make_skill_dir(

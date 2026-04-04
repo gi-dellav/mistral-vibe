@@ -5,8 +5,8 @@ from collections.abc import Callable
 import httpx
 import pytest
 
-from vibe.cli.update_notifier.adapters.pypi_update_gateway import PyPIUpdateGateway
-from vibe.cli.update_notifier.ports.update_gateway import (
+from glider.cli.update_notifier.adapters.pypi_update_gateway import PyPIUpdateGateway
+from glider.cli.update_notifier.ports.update_gateway import (
     Update,
     UpdateGatewayCause,
     UpdateGatewayError,
@@ -26,7 +26,7 @@ async def test_retrieves_nothing_when_no_versions_are_available() -> None:
 
     transport = httpx.MockTransport(handler)
     async with httpx.AsyncClient(transport=transport, base_url=PYPI_API_URL) as client:
-        gateway = PyPIUpdateGateway(project_name="mistral-vibe", client=client)
+        gateway = PyPIUpdateGateway(project_name="glider-code", client=client)
         update = await gateway.fetch_update()
 
     assert update is None
@@ -36,19 +36,19 @@ async def test_retrieves_nothing_when_no_versions_are_available() -> None:
 async def test_retrieves_the_latest_non_yanked_version() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.headers["Accept"] == "application/vnd.pypi.simple.v1+json"
-        assert request.url.path == "/simple/mistral-vibe/"
+        assert request.url.path == "/simple/glider-code/"
         return httpx.Response(
             status_code=httpx.codes.OK,
             json={
                 "versions": ["1.0.0", "1.0.1", "1.0.2"],
                 "files": [
                     {
-                        "filename": "mistral_vibe-1.0.0-py3-none-any.whl",
+                        "filename": "mistral_glider-1.0.0-py3-none-any.whl",
                         "yanked": False,
                     },
-                    {"filename": "mistral_vibe-1.0.1-py3-none-any.whl", "yanked": True},
+                    {"filename": "mistral_glider-1.0.1-py3-none-any.whl", "yanked": True},
                     {
-                        "filename": "mistral_vibe-1.0.2-py3-none-any.whl",
+                        "filename": "mistral_glider-1.0.2-py3-none-any.whl",
                         "yanked": False,
                     },
                 ],
@@ -57,7 +57,7 @@ async def test_retrieves_the_latest_non_yanked_version() -> None:
 
     transport = httpx.MockTransport(handler)
     async with httpx.AsyncClient(transport=transport, base_url=PYPI_API_URL) as client:
-        gateway = PyPIUpdateGateway(project_name="mistral-vibe", client=client)
+        gateway = PyPIUpdateGateway(project_name="glider-code", client=client)
         update = await gateway.fetch_update()
 
     assert update == Update(latest_version="1.0.2")
@@ -71,14 +71,14 @@ async def test_retrieves_nothing_when_only_yanked_versions_are_available() -> No
             json={
                 "versions": ["1.0.0"],
                 "files": [
-                    {"filename": "mistral_vibe-1.0.0-py3-none-any.whl", "yanked": True}
+                    {"filename": "mistral_glider-1.0.0-py3-none-any.whl", "yanked": True}
                 ],
             },
         )
 
     transport = httpx.MockTransport(handler)
     async with httpx.AsyncClient(transport=transport, base_url=PYPI_API_URL) as client:
-        gateway = PyPIUpdateGateway(project_name="mistral-vibe", client=client)
+        gateway = PyPIUpdateGateway(project_name="glider-code", client=client)
         update = await gateway.fetch_update()
 
     assert update is None
@@ -93,7 +93,7 @@ async def test_does_not_match_versions_by_substring() -> None:
                 "versions": ["1.0.1"],
                 "files": [
                     {
-                        "filename": "mistral_vibe-1.0.10-py3-none-any.whl",
+                        "filename": "mistral_glider-1.0.10-py3-none-any.whl",
                         "yanked": False,
                     }
                 ],
@@ -102,7 +102,7 @@ async def test_does_not_match_versions_by_substring() -> None:
 
     transport = httpx.MockTransport(handler)
     async with httpx.AsyncClient(transport=transport, base_url=PYPI_API_URL) as client:
-        gateway = PyPIUpdateGateway(project_name="mistral-vibe", client=client)
+        gateway = PyPIUpdateGateway(project_name="glider-code", client=client)
         update = await gateway.fetch_update()
 
     assert update is None
@@ -146,7 +146,7 @@ async def test_retrieves_nothing_when_fetching_update_fails(
 ) -> None:
     transport = httpx.MockTransport(handler)
     async with httpx.AsyncClient(transport=transport, base_url=PYPI_API_URL) as client:
-        gateway = PyPIUpdateGateway(project_name="mistral-vibe", client=client)
+        gateway = PyPIUpdateGateway(project_name="glider-code", client=client)
         with pytest.raises(UpdateGatewayError) as excinfo:
             await gateway.fetch_update()
 

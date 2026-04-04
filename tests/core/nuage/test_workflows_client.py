@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from vibe.core.nuage.client import WorkflowsClient
-from vibe.core.nuage.exceptions import ErrorCode, WorkflowsException
-from vibe.core.nuage.streaming import StreamEvent, StreamEventsQueryParams
+from glider.core.nuage.client import WorkflowsClient
+from glider.core.nuage.exceptions import ErrorCode, WorkflowsException
+from glider.core.nuage.streaming import StreamEvent, StreamEventsQueryParams
 
 
 def _make_client() -> WorkflowsClient:

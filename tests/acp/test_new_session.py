@@ -6,16 +6,16 @@ from unittest.mock import patch
 import pytest
 
 from tests.acp.conftest import _create_acp_agent
-from tests.conftest import build_test_vibe_config
-from vibe.acp.acp_agent_loop import VibeAcpAgentLoop
-from vibe.core.agent_loop import AgentLoop
-from vibe.core.agents.models import BuiltinAgentName
-from vibe.core.config import ModelConfig
+from tests.conftest import build_test_glider_config
+from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.core.agent_loop import AgentLoop
+from glider.core.agents.models import BuiltinAgentName
+from glider.core.config import ModelConfig
 
 
 @pytest.fixture
 def acp_agent_loop(backend) -> VibeAcpAgentLoop:
-    config = build_test_vibe_config(
+    config = build_test_glider_config(
         active_model="devstral-latest",
         models=[
             ModelConfig(
@@ -48,7 +48,7 @@ class TestACPNewSession:
         )
 
         new_session_events = [
-            e for e in telemetry_events if e.get("event_name") == "vibe.new_session"
+            e for e in telemetry_events if e.get("event_name") == "glider.new_session"
         ]
         assert len(new_session_events) == 1
         assert new_session_events[0]["properties"]["entrypoint"] == "acp"

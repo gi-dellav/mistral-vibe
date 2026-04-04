@@ -12,18 +12,18 @@ from mistralai.client.models import (
 import pytest
 import respx
 
-from tests.conftest import build_test_agent_loop, build_test_vibe_config
+from tests.conftest import build_test_agent_loop, build_test_glider_config
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
-from vibe.core.config import ModelConfig, ProviderConfig, VibeConfig
-from vibe.core.llm.backend.generic import GenericBackend, OpenAIAdapter
-from vibe.core.llm.backend.mistral import MistralBackend, MistralMapper, ParsedContent
-from vibe.core.llm.format import APIToolFormatHandler
-from vibe.core.types import AssistantEvent, LLMMessage, ReasoningEvent, Role
+from glider.core.config import ModelConfig, ProviderConfig, GliderConfig
+from glider.core.llm.backend.generic import GenericBackend, OpenAIAdapter
+from glider.core.llm.backend.mistral import MistralBackend, MistralMapper, ParsedContent
+from glider.core.llm.format import APIToolFormatHandler
+from glider.core.types import AssistantEvent, LLMMessage, ReasoningEvent, Role
 
 
-def make_config() -> VibeConfig:
-    return build_test_vibe_config(
+def make_config() -> GliderConfig:
+    return build_test_glider_config(
         system_prompt_id="tests",
         include_project_context=False,
         include_prompt_detail=False,

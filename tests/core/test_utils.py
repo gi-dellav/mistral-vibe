@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from vibe.core.utils import get_server_url_from_api_base
-from vibe.core.utils.io import read_safe
+from glider.core.utils import get_server_url_from_api_base
+from glider.core.utils.io import read_safe
 
 
 @pytest.mark.parametrize(

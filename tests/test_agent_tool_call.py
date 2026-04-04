@@ -6,16 +6,16 @@ import json
 from pydantic import BaseModel
 import pytest
 
-from tests.conftest import build_test_agent_loop, build_test_vibe_config
+from tests.conftest import build_test_agent_loop, build_test_glider_config
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
 from tests.stubs.fake_tool import FakeTool
-from vibe.core.agent_loop import AgentLoop
-from vibe.core.agents.models import BuiltinAgentName
-from vibe.core.config import VibeConfig
-from vibe.core.tools.base import ToolPermission
-from vibe.core.tools.builtins.todo import TodoItem
-from vibe.core.types import (
+from glider.core.agent_loop import AgentLoop
+from glider.core.agents.models import BuiltinAgentName
+from glider.core.config import GliderConfig
+from glider.core.tools.base import ToolPermission
+from glider.core.tools.builtins.todo import TodoItem
+from glider.core.types import (
     ApprovalCallback,
     ApprovalResponse,
     AssistantEvent,
@@ -34,8 +34,8 @@ async def act_and_collect_events(agent_loop: AgentLoop, prompt: str) -> list[Bas
     return [ev async for ev in agent_loop.act(prompt)]
 
 
-def make_config(todo_permission: ToolPermission = ToolPermission.ALWAYS) -> VibeConfig:
-    return build_test_vibe_config(
+def make_config(todo_permission: ToolPermission = ToolPermission.ALWAYS) -> GliderConfig:
+    return build_test_glider_config(
         enabled_tools=["todo"],
         tools={"todo": {"permission": todo_permission.value}},
         system_prompt_id="tests",
@@ -112,7 +112,7 @@ async def test_single_tool_call_executes_under_auto_approve(
     assert "total_count" in (tool_msgs[-1].content or "")
 
     tool_finished = [
-        e for e in telemetry_events if e.get("event_name") == "vibe.tool_call_finished"
+        e for e in telemetry_events if e.get("event_name") == "glider.tool_call_finished"
     ]
     assert len(tool_finished) == 1
     assert tool_finished[0]["properties"]["tool_name"] == "todo"
@@ -157,7 +157,7 @@ async def test_tool_call_requires_approval_if_not_auto_approved(
     assert agent_loop.stats.tool_calls_succeeded == 0
 
     tool_finished = [
-        e for e in telemetry_events if e.get("event_name") == "vibe.tool_call_finished"
+        e for e in telemetry_events if e.get("event_name") == "glider.tool_call_finished"
     ]
     assert len(tool_finished) == 1
     assert tool_finished[0]["properties"]["approval_type"] == "ask"
@@ -197,7 +197,7 @@ async def test_tool_call_approved_by_callback(telemetry_events: list[dict]) -> N
     assert agent_loop.stats.tool_calls_succeeded == 1
 
     tool_finished = [
-        e for e in telemetry_events if e.get("event_name") == "vibe.tool_call_finished"
+        e for e in telemetry_events if e.get("event_name") == "glider.tool_call_finished"
     ]
     assert len(tool_finished) == 1
     assert tool_finished[0]["properties"]["approval_type"] == "ask"
@@ -243,7 +243,7 @@ async def test_tool_call_rejected_when_auto_approve_disabled_and_rejected_by_cal
     assert agent_loop.stats.tool_calls_succeeded == 0
 
     tool_finished = [
-        e for e in telemetry_events if e.get("event_name") == "vibe.tool_call_finished"
+        e for e in telemetry_events if e.get("event_name") == "glider.tool_call_finished"
     ]
     assert len(tool_finished) == 1
     assert tool_finished[0]["properties"]["approval_type"] == "ask"
@@ -287,7 +287,7 @@ async def test_tool_call_skipped_when_permission_is_never(
     assert agent_loop.stats.tool_calls_succeeded == 0
 
     tool_finished = [
-        e for e in telemetry_events if e.get("event_name") == "vibe.tool_call_finished"
+        e for e in telemetry_events if e.get("event_name") == "glider.tool_call_finished"
     ]
     assert len(tool_finished) == 1
     assert tool_finished[0]["properties"]["approval_type"] == "never"
@@ -448,7 +448,7 @@ async def test_tool_call_can_be_interrupted() -> None:
     tool_call = ToolCall(
         id="call_8", index=0, function=FunctionCall(name="stub_tool", arguments="{}")
     )
-    config = build_test_vibe_config(enabled_tools=["stub_tool"])
+    config = build_test_glider_config(enabled_tools=["stub_tool"])
     agent_loop = build_test_agent_loop(
         config=config,
         agent_name=BuiltinAgentName.AUTO_APPROVE,
@@ -563,7 +563,7 @@ async def test_parallel_tool_calls_produce_correct_events(
     assert agent_loop.stats.tool_calls_succeeded == 2
 
     tool_finished = [
-        e for e in telemetry_events if e.get("event_name") == "vibe.tool_call_finished"
+        e for e in telemetry_events if e.get("event_name") == "glider.tool_call_finished"
     ]
     assert len(tool_finished) == 2
 
@@ -688,7 +688,7 @@ async def test_parallel_mixed_approval_and_rejection(
     assert agent_loop.stats.tool_calls_succeeded == 1
 
     tool_finished = [
-        e for e in telemetry_events if e.get("event_name") == "vibe.tool_call_finished"
+        e for e in telemetry_events if e.get("event_name") == "glider.tool_call_finished"
     ]
     assert len(tool_finished) == 2
 
@@ -729,7 +729,7 @@ async def test_parallel_three_tools_all_succeed(telemetry_events: list[dict]) ->
     assert len(tool_msgs) == 3
 
     tool_finished = [
-        e for e in telemetry_events if e.get("event_name") == "vibe.tool_call_finished"
+        e for e in telemetry_events if e.get("event_name") == "glider.tool_call_finished"
     ]
     assert len(tool_finished) == 3
 

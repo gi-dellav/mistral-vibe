@@ -1,9 +1,9 @@
-# Mistral Vibe
+# Glider for Mistral
 
-[![PyPI Version](https://img.shields.io/pypi/v/mistral-vibe)](https://pypi.org/project/mistral-vibe)
+[![PyPI Version](https://img.shields.io/pypi/v/mistral-glider)](https://pypi.org/project/mistral-glider)
 [![Python Version](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/release/python-3120/)
 [![CI Status](https://github.com/mistralai/mistral-vibe/actions/workflows/ci.yml/badge.svg)](https://github.com/mistralai/mistral-vibe/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/mistralai/mistral-vibe)](https://github.com/mistralai/mistral-vibe/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/mistralai/mistral-glider)](https://github.com/mistralai/mistral-vibe/blob/main/LICENSE)
 
 ```
 ██████████████████░░
@@ -19,10 +19,10 @@
 
 **Mistral's open-source CLI coding assistant.**
 
-Mistral Vibe is a command-line coding assistant powered by Mistral's models. It provides a conversational interface to your codebase, allowing you to use natural language to explore, modify, and interact with your projects through a powerful set of tools.
+Glider for Mistral is a command-line coding assistant powered by Mistral's models. It provides a conversational interface to your codebase, allowing you to use natural language to explore, modify, and interact with your projects through a powerful set of tools.
 
 > [!WARNING]
-> Mistral Vibe works on Windows, but we officially support and target UNIX environments.
+> Glider for Mistral works on Windows, but we officially support and target UNIX environments.
 
 ### One-line install (recommended)
 
@@ -45,13 +45,13 @@ Then, use uv command below.
 ### Using uv
 
 ```bash
-uv tool install mistral-vibe
+uv tool install mistral-glider
 ```
 
 ### Using pip
 
 ```bash
-pip install mistral-vibe
+pip install mistral-glider
 ```
 
 ## Table of Contents
@@ -83,7 +83,7 @@ pip install mistral-vibe
   - [MCP Server Configuration](#mcp-server-configuration)
   - [Session Management](#session-management)
   - [Update Settings](#update-settings)
-  - [Custom Vibe Home Directory](#custom-vibe-home-directory)
+  - [Custom Glider Home Directory](#custom-glider-home-directory)
 - [Editors/IDEs](#editorsides)
 - [Resources](#resources)
 - [Data collection & usage](#data-collection--usage)
@@ -99,7 +99,7 @@ pip install mistral-vibe
   - Manage a `todo` list to track the agent's work.
   - Ask interactive questions to gather user input (`ask_user_question`).
   - Delegate tasks to subagents for parallel work (`task`).
-- **Project-Aware Context**: Vibe automatically scans your project's file structure and Git status to provide relevant context to the agent, improving its understanding of your codebase.
+- **Project-Aware Context**: Glider automatically scans your project's file structure and Git status to provide relevant context to the agent, improving its understanding of your codebase.
 - **Advanced CLI Experience**: Built with modern libraries for a smooth and efficient workflow.
   - Autocompletion for slash commands (`/`) and file paths (`@`).
   - Persistent command history.
@@ -110,7 +110,7 @@ pip install mistral-vibe
 
 ### Built-in Agents
 
-Vibe comes with several built-in agent profiles, each designed for different use cases:
+Glider comes with several built-in agent profiles, each designed for different use cases:
 
 - **`default`**: Standard agent that requires approval for tool executions. Best for general use.
 - **`plan`**: Read-only agent for exploration and planning. Auto-approves safe tools like `grep` and `read_file`.
@@ -120,12 +120,12 @@ Vibe comes with several built-in agent profiles, each designed for different use
 Use the `--agent` flag to select a different agent:
 
 ```bash
-vibe --agent plan
+glider --agent plan
 ```
 
 ### Subagents and Task Delegation
 
-Vibe supports subagents for delegating tasks. Subagents run independently and can perform specialized work without user interaction, preventing the context from being overloaded.
+Glider supports subagents for delegating tasks. Subagents run independently and can perform specialized work without user interaction, preventing the context from being overloaded.
 
 The `task` tool allows the agent to delegate work to subagents:
 
@@ -137,7 +137,7 @@ The `task` tool allows the agent to delegate work to subagents:
 > task(task="Analyze the project structure and architecture", agent="explore")
 ```
 
-Create custom subagents by adding `agent_type = "subagent"` to your agent configuration. Vibe comes with a built-in subagent called `explore`, a read-only subagent for codebase exploration used internally for delegation.
+Create custom subagents by adding `agent_type = "subagent"` to your agent configuration. Glider comes with a built-in subagent called `explore`, a read-only subagent for codebase exploration used internally for delegation.
 
 ### Interactive User Questions
 
@@ -162,7 +162,7 @@ The agent can ask multiple questions at once, displayed as tabs. Each question s
 
 ## Terminal Requirements
 
-Vibe's interactive interface requires a modern terminal emulator. Recommended terminal emulators include:
+Glider's interactive interface requires a modern terminal emulator. Recommended terminal emulators include:
 
 - **WezTerm** (cross-platform)
 - **Alacritty** (cross-platform)
@@ -179,18 +179,18 @@ Most modern terminals should work, but older or minimal terminal emulators may h
    cd /path/to/your/project
    ```
 
-2. Run Vibe:
+2. Run Glider:
 
    ```bash
-   vibe
+   glider
    ```
 
-3. If this is your first time running Vibe, it will:
-   - Create a default configuration file at `~/.vibe/config.toml`
+3. If this is your first time running Glider, it will:
+   - Create a default configuration file at `~/.glider/config.toml`
    - Prompt you to enter your API key if it's not already configured
-   - Save your API key to `~/.vibe/.env` for future use
+   - Save your API key to `~/.glider/.env` for future use
 
-   Alternatively, you can configure your API key separately using `vibe --setup`.
+   Alternatively, you can configure your API key separately using `glider --setup`.
 
 4. Start interacting with the agent!
 
@@ -210,7 +210,7 @@ Most modern terminals should work, but older or minimal terminal emulators may h
 
 ### Interactive Mode
 
-Simply run `vibe` to enter the interactive chat loop.
+Simply run `glider` to enter the interactive chat loop.
 
 - **Multi-line Input**: Press `Ctrl+J` or `Shift+Enter` for select terminals to insert a newline.
 - **File Paths**: Reference files in your prompt using the `@` symbol for smart autocompletion (e.g., `> Read the file @src/agent.py`).
@@ -220,28 +220,28 @@ Simply run `vibe` to enter the interactive chat loop.
 - **Todo View Toggle**: Press `Ctrl+T` to toggle the todo list view.
 - **Auto-Approve Toggle**: Press `Shift+Tab` to toggle auto-approve mode on/off.
 
-You can start Vibe with a prompt using the following command:
+You can start Glider with a prompt using the following command:
 
 ```bash
-vibe "Refactor the main function in cli/main.py to be more modular."
+glider "Refactor the main function in cli/main.py to be more modular."
 ```
 
 **Note**: The `--auto-approve` flag automatically approves all tool executions without prompting. In interactive mode, you can also toggle auto-approve on/off using `Shift+Tab`.
 
 ### Trust Folder System
 
-Vibe includes a trust folder system to ensure you only run the agent in directories you trust. When you first run Vibe in a new directory which contains a `.vibe` subfolder, it may ask you to confirm whether you trust the folder.
+Glider includes a trust folder system to ensure you only run the agent in directories you trust. When you first run Glider in a new directory which contains a `.glider` subfolder, it may ask you to confirm whether you trust the folder.
 
-Trusted folders are remembered for future sessions. You can manage trusted folders through its configuration file `~/.vibe/trusted_folders.toml`.
+Trusted folders are remembered for future sessions. You can manage trusted folders through its configuration file `~/.glider/trusted_folders.toml`.
 
 This safety feature helps prevent accidental execution in sensitive directories.
 
 ### Programmatic Mode
 
-You can run Vibe non-interactively by piping input or using the `--prompt` flag. This is useful for scripting.
+You can run Glider non-interactively by piping input or using the `--prompt` flag. This is useful for scripting.
 
 ```bash
-vibe --prompt "Refactor the main function in cli/main.py to be more modular."
+glider --prompt "Refactor the main function in cli/main.py to be more modular."
 ```
 
 By default, it uses `auto-approve` mode.
@@ -261,7 +261,7 @@ When using `--prompt`, you can specify additional options:
 Example:
 
 ```bash
-vibe --prompt "Analyze the codebase" --max-turns 5 --max-price 1.0 --output json
+glider --prompt "Analyze the codebase" --max-turns 5 --max-price 1.0 --output json
 ```
 
 ## Voice Mode
@@ -294,7 +294,7 @@ Use slash commands for meta-actions and configuration changes during a session.
 
 ### Built-in Slash Commands
 
-Vibe provides several built-in slash commands. Use slash commands by typing them in the input box:
+Glider provides several built-in slash commands. Use slash commands by typing them in the input box:
 
 ```
 > /help
@@ -302,7 +302,7 @@ Vibe provides several built-in slash commands. Use slash commands by typing them
 
 ### Custom Slash Commands via Skills
 
-You can define your own slash commands through the skills system. Skills are reusable components that extend Vibe's functionality.
+You can define your own slash commands through the skills system. Skills are reusable components that extend Glider's functionality.
 
 To create a custom slash command:
 
@@ -324,13 +324,13 @@ Custom slash commands appear in the autocompletion menu alongside built-in comma
 
 ## Skills System
 
-Vibe's skills system allows you to extend functionality through reusable components. Skills can add new tools, slash commands, and specialized behaviors.
+Glider's skills system allows you to extend functionality through reusable components. Skills can add new tools, slash commands, and specialized behaviors.
 
-Vibe follows the [Agent Skills specification](https://agentskills.io/specification) for skill format and structure.
+Glider follows the [Agent Skills specification](https://agentskills.io/specification) for skill format and structure.
 
 ### Creating Skills
 
-Skills are defined in directories with a `SKILL.md` file containing metadata in YAML frontmatter. For example, `~/.vibe/skills/code-review/SKILL.md`:
+Skills are defined in directories with a `SKILL.md` file containing metadata in YAML frontmatter. For example, `~/.glider/skills/code-review/SKILL.md`:
 
 ```markdown
 ---
@@ -352,12 +352,12 @@ This skill helps analyze code quality and suggest improvements.
 
 ### Skill Discovery
 
-Vibe discovers skills from multiple locations:
+Glider discovers skills from multiple locations:
 
 1. **Custom paths**: Configured in `config.toml` via `skill_paths`
 2. **Standard Agent Skills path** (project root, trusted folders only): `.agents/skills/` — [Agent Skills](https://agentskills.io) standard
-3. **Local project skills** (project root, trusted folders only): `.vibe/skills/` in your project
-4. **Global skills directory**: `~/.vibe/skills/`
+3. **Local project skills** (project root, trusted folders only): `.glider/skills/` in your project
+4. **Global skills directory**: `~/.glider/skills/`
 
 ```toml
 skill_paths = ["/path/to/custom/skills"]
@@ -381,17 +381,17 @@ Skills support the same pattern matching as tools (exact names, glob patterns, a
 
 ### Configuration File Location
 
-Vibe is configured via a `config.toml` file. It looks for this file first in `./.vibe/config.toml` and then falls back to `~/.vibe/config.toml`.
+Glider is configured via a `config.toml` file. It looks for this file first in `./.glider/config.toml` and then falls back to `~/.glider/config.toml`.
 
 ### API Key Configuration
 
-To use Vibe, you'll need a Mistral API key. You can obtain one by signing up at [https://console.mistral.ai](https://console.mistral.ai).
+To use Glider, you'll need a Mistral API key. You can obtain one by signing up at [https://console.mistral.ai](https://console.mistral.ai).
 
-You can configure your API key using `vibe --setup`, or through one of the methods below.
+You can configure your API key using `glider --setup`, or through one of the methods below.
 
-Vibe supports multiple ways to configure your API keys:
+Glider supports multiple ways to configure your API keys:
 
-1. **Interactive Setup (Recommended for first-time users)**: When you run Vibe for the first time or if your API key is missing, Vibe will prompt you to enter it. The key will be securely saved to `~/.vibe/.env` for future sessions.
+1. **Interactive Setup (Recommended for first-time users)**: When you run Glider for the first time or if your API key is missing, Glider will prompt you to enter it. The key will be securely saved to `~/.glider/.env` for future sessions.
 
 2. **Environment Variables**: Set your API key as an environment variable:
 
@@ -399,19 +399,19 @@ Vibe supports multiple ways to configure your API keys:
    export MISTRAL_API_KEY="your_mistral_api_key"
    ```
 
-3. **`.env` File**: Create a `.env` file in `~/.vibe/` and add your API keys:
+3. **`.env` File**: Create a `.env` file in `~/.glider/` and add your API keys:
 
    ```bash
    MISTRAL_API_KEY=your_mistral_api_key
    ```
 
-   Vibe automatically loads API keys from `~/.vibe/.env` on startup. Environment variables take precedence over the `.env` file if both are set.
+   Glider automatically loads API keys from `~/.glider/.env` on startup. Environment variables take precedence over the `.env` file if both are set.
 
-**Note**: The `.env` file is specifically for API keys and other provider credentials. General Vibe configuration should be done in `config.toml`.
+**Note**: The `.env` file is specifically for API keys and other provider credentials. General Glider configuration should be done in `config.toml`.
 
 ### Custom System Prompts
 
-You can create custom system prompts to replace the default one (`prompts/cli.md`). Create a markdown file in the `~/.vibe/prompts/` directory with your custom prompt content.
+You can create custom system prompts to replace the default one (`prompts/cli.md`). Create a markdown file in the `~/.glider/prompts/` directory with your custom prompt content.
 
 To use a custom system prompt, set the `system_prompt_id` in your configuration to match the filename (without the `.md` extension):
 
@@ -420,21 +420,21 @@ To use a custom system prompt, set the `system_prompt_id` in your configuration 
 system_prompt_id = "my_custom_prompt"
 ```
 
-This will load the prompt from `~/.vibe/prompts/my_custom_prompt.md`.
+This will load the prompt from `~/.glider/prompts/my_custom_prompt.md`.
 
 ### Custom Agent Configurations
 
-You can create custom agent configurations for specific use cases (e.g., red-teaming, specialized tasks) by adding agent-specific TOML files in the `~/.vibe/agents/` directory.
+You can create custom agent configurations for specific use cases (e.g., red-teaming, specialized tasks) by adding agent-specific TOML files in the `~/.glider/agents/` directory.
 
-To use a custom agent, run Vibe with the `--agent` flag:
+To use a custom agent, run Glider with the `--agent` flag:
 
 ```bash
-vibe --agent my_custom_agent
+glider --agent my_custom_agent
 ```
 
-Vibe will look for a file named `my_custom_agent.toml` in the agents directory and apply its configuration.
+Glider will look for a file named `my_custom_agent.toml` in the agents directory and apply its configuration.
 
-Example custom agent configuration (`~/.vibe/agents/redteam.toml`):
+Example custom agent configuration (`~/.glider/agents/redteam.toml`):
 
 ```toml
 # Custom agent configuration for red-teaming
@@ -452,7 +452,7 @@ permission = "always"
 permission = "always"
 ```
 
-Note: This implies that you have set up a redteam prompt named `~/.vibe/prompts/redteam.md`.
+Note: This implies that you have set up a redteam prompt named `~/.glider/prompts/redteam.md`.
 
 ### Tool Management
 
@@ -481,7 +481,7 @@ Notes:
 
 ### MCP Server Configuration
 
-You can configure MCP (Model Context Protocol) servers to extend Vibe's capabilities. Add MCP server configurations under the `mcp_servers` section:
+You can configure MCP (Model Context Protocol) servers to extend Glider's capabilities. Add MCP server configurations under the `mcp_servers` section:
 
 ```toml
 # Example MCP server configurations
@@ -559,17 +559,17 @@ tool_timeout_sec = 120
 
 #### Session Continuation and Resumption
 
-Vibe supports continuing from previous sessions:
+Glider supports continuing from previous sessions:
 
 - **`--continue`** or **`-c`**: Continue from the most recent saved session
 - **`--resume SESSION_ID`**: Resume a specific session by ID (supports partial matching)
 
 ```bash
 # Continue from last session
-vibe --continue
+glider --continue
 
 # Resume specific session
-vibe --resume abc123
+glider --resume abc123
 ```
 
 Session logging must be enabled in your configuration for these features to work.
@@ -579,16 +579,16 @@ Session logging must be enabled in your configuration for these features to work
 Use the `--workdir` option to specify a working directory:
 
 ```bash
-vibe --workdir /path/to/project
+glider --workdir /path/to/project
 ```
 
-This is useful when you want to run Vibe from a different location than your current directory.
+This is useful when you want to run Glider from a different location than your current directory.
 
 ### Update Settings
 
 #### Auto-Update
 
-Vibe includes an automatic update feature that keeps your installation current. This is enabled by default.
+Glider includes an automatic update feature that keeps your installation current. This is enabled by default.
 
 To disable auto-updates, add this to your `config.toml`:
 
@@ -598,7 +598,7 @@ enable_auto_update = false
 
 ### Notification Settings
 
-Vibe can notify you when the agent needs your attention (awaiting approval, asking a question, or task complete). This is useful when you switch to another window while the agent works.
+Glider can notify you when the agent needs your attention (awaiting approval, asking a question, or task complete). This is useful when you switch to another window while the agent works.
 
 To disable notifications:
 
@@ -606,15 +606,15 @@ To disable notifications:
 enable_notifications = false
 ```
 
-### Custom Vibe Home Directory
+### Custom Glider Home Directory
 
-By default, Vibe stores its configuration in `~/.vibe/`. You can override this by setting the `VIBE_HOME` environment variable:
+By default, Glider stores its configuration in `~/.glider/`. You can override this by setting the `GLIDER_HOME` environment variable:
 
 ```bash
-export VIBE_HOME="/path/to/custom/vibe/home"
+export GLIDER_HOME="/path/to/custom/glider/home"
 ```
 
-This affects where Vibe looks for:
+This affects where Glider looks for:
 
 - `config.toml` - Main configuration
 - `.env` - API keys
@@ -625,7 +625,7 @@ This affects where Vibe looks for:
 
 ## Editors/IDEs
 
-Mistral Vibe can be used in text editors and IDEs that support [Agent Client Protocol](https://agentclientprotocol.com/overview/clients). See the [ACP Setup documentation](docs/acp-setup.md) for setup instructions for various editors and IDEs.
+Glider for Mistral can be used in text editors and IDEs that support [Agent Client Protocol](https://agentclientprotocol.com/overview/clients). See the [ACP Setup documentation](docs/acp-setup.md) for setup instructions for various editors and IDEs.
 
 ## Resources
 
@@ -634,7 +634,7 @@ Mistral Vibe can be used in text editors and IDEs that support [Agent Client Pro
 
 ## Data collection & usage
 
-Use of Vibe is subject to our [Privacy Policy](https://legal.mistral.ai/terms/privacy-policy) and may include the collection and processing of data related to your use of the service, such as usage data, to operate, maintain, and improve Vibe. You can disable telemetry in your `config.toml` by setting `enable_telemetry = false`.
+Use of Glider is subject to our [Privacy Policy](https://legal.mistral.ai/terms/privacy-policy) and may include the collection and processing of data related to your use of the service, such as usage data, to operate, maintain, and improve Glider. You can disable telemetry in your `config.toml` by setting `enable_telemetry = false`.
 
 ## License
 

@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from vibe.core.teleport.errors import (
+from glider.core.teleport.errors import (
     ServiceTeleportError,
     ServiceTeleportNotSupportedError,
 )
-from vibe.core.teleport.git import GitRepoInfo, GitRepository
+from glider.core.teleport.git import GitRepoInfo, GitRepository
 
 
 def make_mock_remote(url: str) -> MagicMock:

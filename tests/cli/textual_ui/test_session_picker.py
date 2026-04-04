@@ -4,11 +4,11 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from vibe.cli.textual_ui.widgets.session_picker import (
+from glider.cli.textual_ui.widgets.session_picker import (
     SessionPickerApp,
     _format_relative_time,
 )
-from vibe.core.session.resume_sessions import ResumeSessionInfo
+from glider.core.session.resume_sessions import ResumeSessionInfo
 
 
 @pytest.fixture

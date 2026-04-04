@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from vibe.acp.utils import (
+from glider.acp.utils import (
     TOOL_OPTIONS,
     ToolOption,
     build_permission_options,
     get_proxy_help_text,
 )
-from vibe.core.paths import GLOBAL_ENV_FILE
-from vibe.core.proxy_setup import SUPPORTED_PROXY_VARS
-from vibe.core.tools.permissions import PermissionScope, RequiredPermission
+from glider.core.paths import GLOBAL_ENV_FILE
+from glider.core.proxy_setup import SUPPORTED_PROXY_VARS
+from glider.core.tools.permissions import PermissionScope, RequiredPermission
 
 
 def _write_env_file(content: str) -> None:

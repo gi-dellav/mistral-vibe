@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from vibe.core.paths import PLANS_DIR
-from vibe.core.plan_session import PlanSession
+from glider.core.paths import PLANS_DIR
+from glider.core.plan_session import PlanSession
 
 
 class TestPlanSession:

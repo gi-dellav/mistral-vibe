@@ -7,7 +7,7 @@ from typing import override
 import pytest
 from textual.app import App
 
-from vibe.setup import onboarding
+from glider.setup import onboarding
 
 
 class StubApp(App[str | None]):
@@ -57,4 +57,4 @@ def test_successfully_completes(
     onboarding.run_onboarding(StubApp("completed"))
 
     out = capsys.readouterr().out
-    assert 'Setup complete 🎉. Run "vibe" to start using the Mistral Vibe CLI.' in out
+    assert 'Setup complete 🎉. Run "glider" to start using the Glider for Mistral CLI.' in out

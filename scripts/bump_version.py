@@ -115,7 +115,7 @@ Rules:
 - Remove any subsection that has no bullets (leave no empty ### Added / ### Changed / etc)."""
     try:
         result = subprocess.run(
-            ["vibe", "-p", prompt], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            ["glider", "-p", prompt], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         if result.returncode != 0:
             raise RuntimeError("Failed to auto-fill CHANGELOG.md")
@@ -143,7 +143,7 @@ Rules:
 - Do not copy the full changelog; summarize only what matters to someone reading "what's new" in the app."""
     try:
         result = subprocess.run(
-            ["vibe", "-p", prompt], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            ["glider", "-p", prompt], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         if result.returncode != 0:
             raise RuntimeError("Failed to auto-fill whats_new.md")

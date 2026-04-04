@@ -10,20 +10,20 @@ import httpx
 from pydantic import BaseModel
 import pytest
 
-from tests.conftest import build_test_agent_loop, build_test_vibe_config
+from tests.conftest import build_test_agent_loop, build_test_glider_config
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
-from vibe.core.agents.models import BuiltinAgentName
-from vibe.core.config import VibeConfig
-from vibe.core.llm.exceptions import BackendErrorBuilder
-from vibe.core.middleware import (
+from glider.core.agents.models import BuiltinAgentName
+from glider.core.config import GliderConfig
+from glider.core.llm.exceptions import BackendErrorBuilder
+from glider.core.middleware import (
     ConversationContext,
     MiddlewareAction,
     MiddlewareResult,
     ResetReason,
 )
-from vibe.core.tools.builtins.todo import TodoArgs
-from vibe.core.types import (
+from glider.core.tools.builtins.todo import TodoArgs
+from glider.core.types import (
     ApprovalResponse,
     AssistantEvent,
     FunctionCall,
@@ -36,7 +36,7 @@ from vibe.core.types import (
     ToolResultEvent,
     UserMessageEvent,
 )
-from vibe.core.utils import CancellationReason, get_user_cancellation_message
+from glider.core.utils import CancellationReason, get_user_cancellation_message
 
 
 class InjectBeforeMiddleware:
@@ -54,8 +54,8 @@ class InjectBeforeMiddleware:
 
 def make_config(
     *, enabled_tools: list[str] | None = None, tools: dict[str, dict] | None = None
-) -> VibeConfig:
-    return build_test_vibe_config(
+) -> GliderConfig:
+    return build_test_glider_config(
         system_prompt_id="tests",
         include_project_context=False,
         include_prompt_detail=False,
@@ -100,7 +100,7 @@ async def test_act_flushes_batched_messages_with_injection_middleware(
         Role.user,
         Role.assistant,
     ]
-    assert observed[0][1] == "You are Vibe, a super useful programming assistant."
+    assert observed[0][1] == "You are Glider, a super useful programming assistant."
     assert observed[1][1] == "How can you help?"
     assert observed[2][1] == InjectBeforeMiddleware.injected_message
     assert observed[3][1] == "I can write very efficient code."
@@ -124,7 +124,7 @@ async def test_stop_action_flushes_user_msg_before_returning(observer_capture) -
     assert len(observed) == 2
     # user's message should have been flushed before returning
     assert [r for r, _ in observed] == [Role.system, Role.user]
-    assert observed[0][1] == "You are Vibe, a super useful programming assistant."
+    assert observed[0][1] == "You are Glider, a super useful programming assistant."
     assert observed[1][1] == "Greet."
 
 

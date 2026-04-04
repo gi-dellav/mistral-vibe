@@ -9,13 +9,13 @@ from acp.schema import TextContentBlock, UsageUpdate
 import pytest
 
 from tests.acp.conftest import _create_acp_agent
-from tests.conftest import build_test_vibe_config
+from tests.conftest import build_test_glider_config
 from tests.stubs.fake_backend import FakeBackend
 from tests.stubs.fake_client import FakeClient
-from vibe.acp.acp_agent_loop import VibeAcpAgentLoop
-from vibe.core.agent_loop import AgentLoop
-from vibe.core.config import SessionLoggingConfig
-from vibe.core.types import LLMChunk, LLMMessage, LLMUsage, Role
+from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.core.agent_loop import AgentLoop
+from glider.core.config import SessionLoggingConfig
+from glider.core.types import LLMChunk, LLMMessage, LLMUsage, Role
 
 
 def _make_backend(prompt_tokens: int = 100, completion_tokens: int = 50) -> FakeBackend:
@@ -30,7 +30,7 @@ def _make_backend(prompt_tokens: int = 100, completion_tokens: int = 50) -> Fake
 
 
 def _make_acp_agent(backend: FakeBackend) -> VibeAcpAgentLoop:
-    config = build_test_vibe_config()
+    config = build_test_glider_config()
 
     class PatchedAgentLoop(AgentLoop):
         def __init__(self, *args, **kwargs) -> None:
@@ -224,7 +224,7 @@ class TestLoadSessionUsageUpdate:
         session_config = SessionLoggingConfig(
             save_dir=str(session_dir), session_prefix="session", enabled=True
         )
-        config = build_test_vibe_config(session_logging=session_config)
+        config = build_test_glider_config(session_logging=session_config)
 
         class PatchedAgentLoop(AgentLoop):
             def __init__(self, *args, **kwargs) -> None:

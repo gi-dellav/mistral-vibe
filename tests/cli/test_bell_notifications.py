@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, PropertyMock
 
 import pytest
 
-from vibe.cli.textual_ui.notifications import (
+from glider.cli.textual_ui.notifications import (
     NotificationContext,
     TextualNotificationAdapter,
 )
@@ -24,14 +24,14 @@ def fake_app() -> MagicMock:
 @pytest.fixture
 def adapter_enabled(fake_app: MagicMock) -> TextualNotificationAdapter:
     return TextualNotificationAdapter(
-        fake_app, get_enabled=lambda: True, default_title="Vibe"
+        fake_app, get_enabled=lambda: True, default_title="Glider"
     )
 
 
 @pytest.fixture
 def adapter_disabled(fake_app: MagicMock) -> TextualNotificationAdapter:
     return TextualNotificationAdapter(
-        fake_app, get_enabled=lambda: False, default_title="Vibe"
+        fake_app, get_enabled=lambda: False, default_title="Glider"
     )
 
 
@@ -126,7 +126,7 @@ class TestTextualNotificationAdapter:
     def test_no_title_write_when_headless(self) -> None:
         app = _make_fake_app(is_headless=True)
         adapter = TextualNotificationAdapter(
-            app, get_enabled=lambda: True, default_title="Vibe"
+            app, get_enabled=lambda: True, default_title="Glider"
         )
         adapter.on_blur()
 
@@ -138,7 +138,7 @@ class TestTextualNotificationAdapter:
     def test_enabled_callback_reads_live_value(self, fake_app: MagicMock) -> None:
         enabled = True
         adapter = TextualNotificationAdapter(
-            fake_app, get_enabled=lambda: enabled, default_title="Vibe"
+            fake_app, get_enabled=lambda: enabled, default_title="Glider"
         )
         adapter.on_blur()
 

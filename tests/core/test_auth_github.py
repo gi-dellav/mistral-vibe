@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import httpx
 import pytest
 
-from vibe.core.auth.github import (
+from glider.core.auth.github import (
     DeviceFlowHandle,
     DeviceFlowInfo,
     GitHubAuthError,
@@ -242,7 +242,7 @@ class TestGitHubAuthProviderSaveToken:
             provider = GitHubAuthProvider()
             provider._save_token("ghp_token")
             mock_keyring.set_password.assert_called_once_with(
-                "vibe", "github_token", "ghp_token"
+                "glider", "github_token", "ghp_token"
             )
 
     def test_save_token_raises_on_keyring_error(self) -> None:

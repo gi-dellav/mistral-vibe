@@ -11,14 +11,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 import zstandard
 
-from vibe.core.teleport.errors import (
+from glider.core.teleport.errors import (
     ServiceTeleportError,
     ServiceTeleportNotSupportedError,
 )
-from vibe.core.teleport.git import GitRepoInfo
-from vibe.core.teleport.nuage import GitHubStatus, TeleportSession
-from vibe.core.teleport.teleport import TeleportService
-from vibe.core.teleport.types import (
+from glider.core.teleport.git import GitRepoInfo
+from glider.core.teleport.nuage import GitHubStatus, TeleportSession
+from glider.core.teleport.teleport import TeleportService
+from glider.core.teleport.types import (
     TeleportAuthCompleteEvent,
     TeleportAuthRequiredEvent,
     TeleportCheckingGitEvent,
@@ -145,7 +145,7 @@ class TestTeleportServiceValidateConfig:
             nuage_workflow_id="workflow-id",
             nuage_api_key="",
             workdir=tmp_path,
-            vibe_config=mock_config,
+            glider_config=mock_config,
         )
         with pytest.raises(ServiceTeleportError, match="CUSTOM_API_KEY not set"):
             service._validate_config()

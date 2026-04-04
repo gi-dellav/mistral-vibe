@@ -2,20 +2,20 @@ from __future__ import annotations
 
 import pytest
 
-from tests.conftest import build_test_agent_loop, build_test_vibe_app
+from tests.conftest import build_test_agent_loop, build_test_glider_app
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
-from vibe.cli.textual_ui.app import BottomApp, VibeApp
-from vibe.cli.textual_ui.widgets.chat_input.container import ChatInputContainer
-from vibe.cli.textual_ui.widgets.messages import UserMessage
+from glider.cli.textual_ui.app import BottomApp, GliderApp
+from glider.cli.textual_ui.widgets.chat_input.container import ChatInputContainer
+from glider.cli.textual_ui.widgets.messages import UserMessage
 
 
-def _make_app(num_responses: int = 3) -> VibeApp:
+def _make_app(num_responses: int = 3) -> GliderApp:
     backend = FakeBackend([
         mock_llm_chunk(content=f"Response {i + 1}") for i in range(num_responses)
     ])
     agent_loop = build_test_agent_loop(backend=backend)
-    return build_test_vibe_app(agent_loop=agent_loop)
+    return build_test_glider_app(agent_loop=agent_loop)
 
 
 async def _send_messages(pilot, messages: list[str]) -> None:

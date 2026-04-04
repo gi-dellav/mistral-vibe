@@ -11,7 +11,7 @@ from acp.schema import (
 )
 import pytest
 
-from vibe.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.acp.acp_agent_loop import VibeAcpAgentLoop
 
 
 class TestACPInitialize:
@@ -28,7 +28,7 @@ class TestACPInitialize:
             session_capabilities=SessionCapabilities(list=SessionListCapabilities()),
         )
         assert response.agent_info == Implementation(
-            name="@mistralai/mistral-vibe", title="Mistral Vibe", version="2.7.3"
+            name="@mistralai/glider-code", title="Glider for Mistral", version="2.7.3"
         )
 
         assert response.auth_methods == []
@@ -52,7 +52,7 @@ class TestACPInitialize:
             session_capabilities=SessionCapabilities(list=SessionListCapabilities()),
         )
         assert response.agent_info == Implementation(
-            name="@mistralai/mistral-vibe", title="Mistral Vibe", version="2.7.3"
+            name="@mistralai/glider-code", title="Glider for Mistral", version="2.7.3"
         )
 
         assert response.auth_methods is not None
@@ -60,10 +60,10 @@ class TestACPInitialize:
         auth_method = response.auth_methods[0]
         assert auth_method.id == "vibe-setup"
         assert auth_method.name == "Register your API Key"
-        assert auth_method.description == "Register your API Key inside Mistral Vibe"
+        assert auth_method.description == "Register your API Key inside Glider for Mistral"
         assert auth_method.field_meta is not None
         assert "terminal-auth" in auth_method.field_meta
         terminal_auth_meta = auth_method.field_meta["terminal-auth"]
         assert "command" in terminal_auth_meta
         assert "args" in terminal_auth_meta
-        assert terminal_auth_meta["label"] == "Mistral Vibe Setup"
+        assert terminal_auth_meta["label"] == "Glider for Mistral Setup"

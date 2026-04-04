@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from vibe.core.audio_player import AlreadyPlayingError
-from vibe.core.audio_player.audio_player_port import AudioFormat
+from glider.core.audio_player import AlreadyPlayingError
+from glider.core.audio_player.audio_player_port import AudioFormat
 
 
 class FakeAudioPlayer:

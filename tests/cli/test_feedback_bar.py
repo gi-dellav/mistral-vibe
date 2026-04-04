@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from vibe.cli.textual_ui.widgets.feedback_bar import FeedbackBar
+from glider.cli.textual_ui.widgets.feedback_bar import FeedbackBar
 
 
 class TestFeedbackBarState:

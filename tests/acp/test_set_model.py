@@ -6,16 +6,16 @@ from unittest.mock import patch
 import pytest
 
 from tests.acp.conftest import _create_acp_agent
-from tests.conftest import build_test_vibe_config
-from vibe.acp.acp_agent_loop import VibeAcpAgentLoop
-from vibe.core.agent_loop import AgentLoop
-from vibe.core.config import ModelConfig, VibeConfig
-from vibe.core.types import LLMMessage, Role
+from tests.conftest import build_test_glider_config
+from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.core.agent_loop import AgentLoop
+from glider.core.config import ModelConfig, GliderConfig
+from glider.core.types import LLMMessage, Role
 
 
 @pytest.fixture
 def acp_agent_loop(backend) -> VibeAcpAgentLoop:
-    config = build_test_vibe_config(
+    config = build_test_glider_config(
         active_model="devstral-latest",
         models=[
             ModelConfig(
@@ -35,7 +35,7 @@ def acp_agent_loop(backend) -> VibeAcpAgentLoop:
         ],
     )
 
-    VibeConfig.dump_config(config.model_dump())
+    GliderConfig.dump_config(config.model_dump())
 
     class PatchedAgentLoop(AgentLoop):
         def __init__(self, *args, **kwargs) -> None:
@@ -126,7 +126,7 @@ class TestACPSetModel:
         )
         session_id = session_response.session_id
 
-        with patch("vibe.acp.acp_agent_loop.VibeConfig.save_updates") as mock_save:
+        with patch("vibe.acp.acp_agent_loop.GliderConfig.save_updates") as mock_save:
             response = await acp_agent_loop.set_session_model(
                 session_id=session_id, model_id="devstral-small"
             )
@@ -143,7 +143,7 @@ class TestACPSetModel:
         )
         session_id = session_response.session_id
 
-        with patch("vibe.acp.acp_agent_loop.VibeConfig.save_updates") as mock_save:
+        with patch("vibe.acp.acp_agent_loop.GliderConfig.save_updates") as mock_save:
             response = await acp_agent_loop.set_session_model(
                 session_id=session_id, model_id="non-existent-model"
             )

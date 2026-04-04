@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from vibe.core.paths._local_config_walk import (
+from glider.core.paths._local_config_walk import (
     _MAX_DIRS,
     WALK_MAX_DEPTH,
     has_config_dirs_nearby,

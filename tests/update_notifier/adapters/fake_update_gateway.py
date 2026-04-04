@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from vibe.cli.update_notifier.ports.update_gateway import (
+from glider.cli.update_notifier.ports.update_gateway import (
     Update,
     UpdateGateway,
     UpdateGatewayError,

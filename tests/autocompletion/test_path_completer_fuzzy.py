@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-import vibe.core.autocompletion.completers as completers_module
-from vibe.core.autocompletion.completers import PathCompleter
-from vibe.core.autocompletion.fuzzy import fuzzy_match as real_fuzzy_match
+import glider.core.autocompletion.completers as completers_module
+from glider.core.autocompletion.completers import PathCompleter
+from glider.core.autocompletion.fuzzy import fuzzy_match as real_fuzzy_match
 
 
 @pytest.fixture()
@@ -127,10 +127,10 @@ def test_fuzzy_matches_directory_traversal(file_tree: Path) -> None:
 def test_directory_prefix_can_match_from_a_nested_path_segment(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    (tmp_path / "vibe" / "acp").mkdir(parents=True)
-    (tmp_path / "vibe" / "acp" / "entrypoint.py").write_text("", encoding="utf-8")
-    (tmp_path / "vibe" / "myacp").mkdir(parents=True)
-    (tmp_path / "vibe" / "myacp" / "entrypoint.py").write_text("", encoding="utf-8")
+    (tmp_path / "glider" / "acp").mkdir(parents=True)
+    (tmp_path / "glider" / "acp" / "entrypoint.py").write_text("", encoding="utf-8")
+    (tmp_path / "glider" / "myacp").mkdir(parents=True)
+    (tmp_path / "glider" / "myacp" / "entrypoint.py").write_text("", encoding="utf-8")
     monkeypatch.chdir(tmp_path)
 
     results = PathCompleter().get_completions("@acp/", cursor_pos=5)

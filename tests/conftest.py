@@ -14,21 +14,21 @@ from tests.update_notifier.adapters.fake_update_cache_repository import (
     FakeUpdateCacheRepository,
 )
 from tests.update_notifier.adapters.fake_update_gateway import FakeUpdateGateway
-from vibe.cli.plan_offer.ports.whoami_gateway import WhoAmIPlanType, WhoAmIResponse
-from vibe.cli.textual_ui.app import CORE_VERSION, StartupOptions, VibeApp
-from vibe.core.agent_loop import AgentLoop
-from vibe.core.agents.models import BuiltinAgentName
-from vibe.core.config import (
+from glider.cli.plan_offer.ports.whoami_gateway import WhoAmIPlanType, WhoAmIResponse
+from glider.cli.textual_ui.app import CORE_VERSION, StartupOptions, GliderApp
+from glider.core.agent_loop import AgentLoop
+from glider.core.agents.models import BuiltinAgentName
+from glider.core.config import (
     DEFAULT_MODELS,
     ModelConfig,
     SessionLoggingConfig,
-    VibeConfig,
+    GliderConfig,
 )
-from vibe.core.config.harness_files import (
+from glider.core.config.harness_files import (
     init_harness_files_manager,
     reset_harness_files_manager,
 )
-from vibe.core.llm.types import BackendLike
+from glider.core.llm.types import BackendLike
 
 
 def get_base_config() -> dict[str, Any]:
@@ -44,7 +44,7 @@ def get_base_config() -> dict[str, Any]:
         ],
         "models": [
             {
-                "name": "mistral-vibe-cli-latest",
+                "name": "glider-code-cli-latest",
                 "provider": "mistral",
                 "alias": "devstral-latest",
             }
@@ -66,26 +66,26 @@ def tmp_working_directory(
 def config_dir(
     monkeypatch: pytest.MonkeyPatch, tmp_path_factory: pytest.TempPathFactory
 ) -> Path:
-    tmp_path = tmp_path_factory.mktemp("vibe")
-    config_dir = tmp_path / ".vibe"
+    tmp_path = tmp_path_factory.mktemp("glider")
+    config_dir = tmp_path / ".glider"
     config_dir.mkdir(parents=True, exist_ok=True)
     config_file = config_dir / "config.toml"
     config_file.write_text(tomli_w.dumps(get_base_config()), encoding="utf-8")
 
-    monkeypatch.setattr("vibe.core.paths._vibe_home._DEFAULT_VIBE_HOME", config_dir)
+    monkeypatch.setattr("glider.core.paths._glider_home._DEFAULT_GLIDER_HOME", config_dir)
     return config_dir
 
 
 @pytest.fixture(autouse=True)
 def _reset_trusted_folders_manager(config_dir: Path) -> None:
-    """Prevent the singleton from writing to the real ~/.vibe/trusted_folders.toml.
+    """Prevent the singleton from writing to the real ~/.glider/trusted_folders.toml.
 
     The module-level ``trusted_folders_manager`` captures its file path at import
     time (before any monkeypatch), so it would otherwise target the real home
     directory.  Redirect it to the temp config dir used by the ``config_dir``
     fixture.
     """
-    from vibe.core.trusted_folders import trusted_folders_manager
+    from glider.core.trusted_folders import trusted_folders_manager
 
     trusted_folders_manager._file_path = config_dir / "trusted_folders.toml"
     trusted_folders_manager._trusted = []
@@ -118,13 +118,13 @@ def _mock_platform(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture(autouse=True)
 def _mock_update_commands(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("vibe.cli.update_notifier.update.UPDATE_COMMANDS", ["true"])
+    monkeypatch.setattr("glider.cli.update_notifier.update.UPDATE_COMMANDS", ["true"])
 
 
 @pytest.fixture(autouse=True)
 def _disable_feedback_bar(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "vibe.cli.textual_ui.widgets.feedback_bar.FEEDBACK_PROBABILITY", 0
+        "glider.cli.textual_ui.widgets.feedback_bar.FEEDBACK_PROBABILITY", 0
     )
 
 
@@ -145,15 +145,15 @@ def telemetry_events(monkeypatch: pytest.MonkeyPatch) -> list[dict[str, Any]]:
         events.append(event)
 
     monkeypatch.setattr(
-        "vibe.core.telemetry.send.TelemetryClient.send_telemetry_event",
+        "glider.core.telemetry.send.TelemetryClient.send_telemetry_event",
         record_telemetry,
     )
     return events
 
 
 @pytest.fixture
-def vibe_app() -> VibeApp:
-    return build_test_vibe_app()
+def glider_app() -> GliderApp:
+    return build_test_glider_app()
 
 
 @pytest.fixture
@@ -162,8 +162,8 @@ def agent_loop() -> AgentLoop:
 
 
 @pytest.fixture
-def vibe_config() -> VibeConfig:
-    return build_test_vibe_config()
+def glider_config() -> GliderConfig:
+    return build_test_glider_config()
 
 
 def make_test_models(auto_compact_threshold: int) -> list[ModelConfig]:
@@ -173,7 +173,7 @@ def make_test_models(auto_compact_threshold: int) -> list[ModelConfig]:
     ]
 
 
-def build_test_vibe_config(**kwargs) -> VibeConfig:
+def build_test_glider_config(**kwargs) -> GliderConfig:
     session_logging = kwargs.pop("session_logging", None)
     resolved_session_logging = (
         SessionLoggingConfig(enabled=False)
@@ -186,7 +186,7 @@ def build_test_vibe_config(**kwargs) -> VibeConfig:
     )
     if kwargs.get("models"):
         kwargs.setdefault("active_model", kwargs["models"][0].alias)
-    return VibeConfig(
+    return GliderConfig(
         session_logging=resolved_session_logging,
         enable_update_checks=resolved_enable_update_checks,
         **kwargs,
@@ -195,14 +195,14 @@ def build_test_vibe_config(**kwargs) -> VibeConfig:
 
 def build_test_agent_loop(
     *,
-    config: VibeConfig | None = None,
+    config: GliderConfig | None = None,
     agent_name: str = BuiltinAgentName.DEFAULT,
     backend: BackendLike | None = None,
     enable_streaming: bool = False,
     **kwargs,
 ) -> AgentLoop:
 
-    resolved_config = config or build_test_vibe_config()
+    resolved_config = config or build_test_glider_config()
 
     return AgentLoop(
         config=resolved_config,
@@ -213,10 +213,10 @@ def build_test_agent_loop(
     )
 
 
-def build_test_vibe_app(
-    *, config: VibeConfig | None = None, agent_loop: AgentLoop | None = None, **kwargs
-) -> VibeApp:
-    app_config = config or build_test_vibe_config()
+def build_test_glider_app(
+    *, config: GliderConfig | None = None, agent_loop: AgentLoop | None = None, **kwargs
+) -> GliderApp:
+    app_config = config or build_test_glider_config()
 
     resolved_agent_loop = agent_loop or build_test_agent_loop(config=app_config)
 
@@ -248,7 +248,7 @@ def build_test_vibe_app(
     )
     voice_manager = kwargs.pop("voice_manager", FakeVoiceManager())
 
-    return VibeApp(
+    return GliderApp(
         agent_loop=resolved_agent_loop,
         startup=StartupOptions(initial_prompt=kwargs.pop("initial_prompt", None)),
         current_version=resolved_current_version,

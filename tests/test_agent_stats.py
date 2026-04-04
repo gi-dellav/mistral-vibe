@@ -6,20 +6,20 @@ import pytest
 
 from tests.conftest import (
     build_test_agent_loop,
-    build_test_vibe_config,
+    build_test_glider_config,
     make_test_models,
 )
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
-from vibe.core.agents.models import BuiltinAgentName
-from vibe.core.config import (
+from glider.core.agents.models import BuiltinAgentName
+from glider.core.config import (
     ModelConfig,
     ProviderConfig,
     SessionLoggingConfig,
-    VibeConfig,
+    GliderConfig,
 )
-from vibe.core.tools.base import ToolPermission
-from vibe.core.types import (
+from glider.core.tools.base import ToolPermission
+from glider.core.types import (
     AgentStats,
     AssistantEvent,
     Backend,
@@ -45,10 +45,10 @@ def make_config(
     include_prompt_detail: bool = False,
     enabled_tools: list[str] | None = None,
     todo_permission: ToolPermission = ToolPermission.ALWAYS,
-) -> VibeConfig:
+) -> GliderConfig:
     models = [
         ModelConfig(
-            name="mistral-vibe-cli-latest",
+            name="glider-code-cli-latest",
             provider="mistral",
             alias="devstral-latest",
             input_price=input_price,
@@ -86,7 +86,7 @@ def make_config(
             backend=Backend.MISTRAL,
         ),
     ]
-    return build_test_vibe_config(
+    return build_test_glider_config(
         session_logging=SessionLoggingConfig(enabled=not disable_logging),
         system_prompt_id=system_prompt_id,
         include_project_context=include_project_context,
@@ -511,7 +511,7 @@ class TestAutoCompactIntegration:
             [mock_llm_chunk(content="<summary>")],
             [mock_llm_chunk(content="<final>")],
         ])
-        cfg = build_test_vibe_config(models=make_test_models(auto_compact_threshold=1))
+        cfg = build_test_glider_config(models=make_test_models(auto_compact_threshold=1))
         agent = build_test_agent_loop(
             config=cfg, message_observer=observer, backend=backend
         )

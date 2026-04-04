@@ -4,17 +4,17 @@ from pathlib import Path
 
 import pytest
 
-from vibe.core.autocompletion.completers import PathCompleter
+from glider.core.autocompletion.completers import PathCompleter
 
 
 @pytest.fixture()
 def file_tree(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    (tmp_path / "vibe" / "acp").mkdir(parents=True)
-    (tmp_path / "vibe" / "acp" / "entrypoint.py").write_text("")
-    (tmp_path / "vibe" / "acp" / "agent.py").write_text("")
-    (tmp_path / "vibe" / "cli" / "autocompletion").mkdir(parents=True)
-    (tmp_path / "vibe" / "cli" / "autocompletion" / "fuzzy.py").write_text("")
-    (tmp_path / "vibe" / "cli" / "autocompletion" / "completers.py").write_text("")
+    (tmp_path / "glider" / "acp").mkdir(parents=True)
+    (tmp_path / "glider" / "acp" / "entrypoint.py").write_text("")
+    (tmp_path / "glider" / "acp" / "agent.py").write_text("")
+    (tmp_path / "glider" / "cli" / "autocompletion").mkdir(parents=True)
+    (tmp_path / "glider" / "cli" / "autocompletion" / "fuzzy.py").write_text("")
+    (tmp_path / "glider" / "cli" / "autocompletion" / "completers.py").write_text("")
     (tmp_path / "tests" / "autocompletion").mkdir(parents=True)
     (tmp_path / "tests" / "autocompletion" / "test_fuzzy.py").write_text("")
     (tmp_path / "README.md").write_text("")

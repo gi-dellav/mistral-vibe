@@ -5,7 +5,7 @@ from pathlib import Path
 from pydantic import ValidationError
 import pytest
 
-from vibe.core.skills.models import SkillInfo, SkillMetadata
+from glider.core.skills.models import SkillInfo, SkillMetadata
 
 
 class TestSkillMetadata:

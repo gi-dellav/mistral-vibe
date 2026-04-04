@@ -7,9 +7,9 @@ import time
 
 import pytest
 
-from vibe.core.config import SessionLoggingConfig
-from vibe.core.session.session_loader import SessionLoader
-from vibe.core.types import LLMMessage, Role, ToolCall
+from glider.core.config import SessionLoggingConfig
+from glider.core.session.session_loader import SessionLoader
+from glider.core.types import LLMMessage, Role, ToolCall
 
 
 @pytest.fixture

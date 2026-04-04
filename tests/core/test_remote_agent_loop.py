@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from tests.conftest import build_test_vibe_config
-from vibe.core.nuage.events import (
+from tests.conftest import build_test_glider_config
+from glider.core.nuage.events import (
     CustomTaskCanceled,
     CustomTaskCanceledAttributes,
     CustomTaskCompleted,
@@ -18,8 +18,8 @@ from vibe.core.nuage.events import (
     JSONPatchReplace,
     JSONPayload,
 )
-from vibe.core.nuage.remote_events_source import RemoteEventsSource
-from vibe.core.types import (
+from glider.core.nuage.remote_events_source import RemoteEventsSource
+from glider.core.types import (
     AssistantEvent,
     ReasoningEvent,
     Role,
@@ -34,7 +34,7 @@ _EXEC_ID = "session-123"
 
 
 def _make_loop(enabled_tools: list[str] | None = None) -> RemoteEventsSource:
-    config = build_test_vibe_config(enabled_tools=enabled_tools or [])
+    config = build_test_glider_config(enabled_tools=enabled_tools or [])
     return RemoteEventsSource(session_id=_EXEC_ID, config=config)
 
 

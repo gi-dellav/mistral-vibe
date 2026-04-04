@@ -4,14 +4,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from tests.conftest import build_test_vibe_config
+from tests.conftest import build_test_glider_config
 from tests.mock.utils import collect_result
-from vibe.core.agents.manager import AgentManager
-from vibe.core.agents.models import BUILTIN_AGENTS, AgentType
-from vibe.core.tools.base import BaseToolState, InvokeContext, ToolError, ToolPermission
-from vibe.core.tools.builtins.task import Task, TaskArgs, TaskResult, TaskToolConfig
-from vibe.core.tools.permissions import PermissionContext
-from vibe.core.types import AssistantEvent, LLMMessage, Role
+from glider.core.agents.manager import AgentManager
+from glider.core.agents.models import BUILTIN_AGENTS, AgentType
+from glider.core.tools.base import BaseToolState, InvokeContext, ToolError, ToolPermission
+from glider.core.tools.builtins.task import Task, TaskArgs, TaskResult, TaskToolConfig
+from glider.core.tools.permissions import PermissionContext
+from glider.core.types import AssistantEvent, LLMMessage, Role
 
 
 @pytest.fixture
@@ -33,7 +33,7 @@ class TestTaskArgs:
 class TestTaskToolValidation:
     @pytest.fixture
     def ctx(self) -> InvokeContext:
-        config = build_test_vibe_config(
+        config = build_test_glider_config(
             include_project_context=False, include_prompt_detail=False
         )
         manager = AgentManager(lambda: config)
@@ -128,7 +128,7 @@ class TestTaskToolResolvePermission:
 class TestTaskToolExecution:
     @pytest.fixture
     def ctx(self) -> InvokeContext:
-        config = build_test_vibe_config(
+        config = build_test_glider_config(
             include_project_context=False, include_prompt_detail=False
         )
         manager = AgentManager(lambda: config)

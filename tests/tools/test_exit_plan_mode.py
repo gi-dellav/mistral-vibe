@@ -7,14 +7,14 @@ from pydantic import BaseModel
 import pytest
 
 from tests.mock.utils import collect_result
-from vibe.core.agents.models import AgentProfile, AgentSafety, BuiltinAgentName
-from vibe.core.tools.base import BaseToolState, InvokeContext, ToolError
-from vibe.core.tools.builtins.ask_user_question import (
+from glider.core.agents.models import AgentProfile, AgentSafety, BuiltinAgentName
+from glider.core.tools.base import BaseToolState, InvokeContext, ToolError
+from glider.core.tools.builtins.ask_user_question import (
     Answer,
     AskUserQuestionArgs,
     AskUserQuestionResult,
 )
-from vibe.core.tools.builtins.exit_plan_mode import (
+from glider.core.tools.builtins.exit_plan_mode import (
     ExitPlanMode,
     ExitPlanModeArgs,
     ExitPlanModeConfig,

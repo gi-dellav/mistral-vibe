@@ -13,14 +13,14 @@ from opentelemetry.sdk.trace.export import (
 from opentelemetry.trace import StatusCode
 import pytest
 
-from tests.conftest import build_test_agent_loop, build_test_vibe_config
+from tests.conftest import build_test_agent_loop, build_test_glider_config
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
-from vibe.core import tracing
-from vibe.core.config import OtelExporterConfig
-from vibe.core.tools.base import BaseToolConfig, ToolPermission
-from vibe.core.tracing import agent_span, setup_tracing, tool_span
-from vibe.core.types import BaseEvent, FunctionCall, ToolCall
+from glider.core import tracing
+from glider.core.config import OtelExporterConfig
+from glider.core.tools.base import BaseToolConfig, ToolPermission
+from glider.core.tracing import agent_span, setup_tracing, tool_span
+from glider.core.types import BaseEvent, FunctionCall, ToolCall
 
 
 class _CollectingExporter(SpanExporter):
@@ -116,12 +116,12 @@ class TestAgentSpan:
 
         assert len(_otel_provider.spans) == 1
         span = _otel_provider.spans[0]
-        assert span.name == "invoke_agent mistral-vibe"
+        assert span.name == "invoke_agent glider-code"
         assert span.status.status_code == StatusCode.OK
         attrs = dict(span.attributes)
         assert attrs["gen_ai.operation.name"] == "invoke_agent"
         assert attrs["gen_ai.provider.name"] == "mistral_ai"
-        assert attrs["gen_ai.agent.name"] == "mistral-vibe"
+        assert attrs["gen_ai.agent.name"] == "glider-code"
         assert attrs["gen_ai.request.model"] == "devstral"
         assert attrs["gen_ai.conversation.id"] == "s1"
 
@@ -318,7 +318,7 @@ class TestIntegration:
             [mock_llm_chunk(content="Let me check.", tool_calls=[tool_call])],
             [mock_llm_chunk(content="Done.")],
         ])
-        config = build_test_vibe_config(
+        config = build_test_glider_config(
             enabled_tools=["todo"],
             tools={"todo": BaseToolConfig(permission=ToolPermission.ALWAYS)},
             system_prompt_id="tests",
@@ -344,13 +344,13 @@ class TestIntegration:
         assert tool.parent.span_id == agent.context.span_id
 
         # -- Agent span: name, status, and every attribute set by agent_span() --
-        assert agent.name == "invoke_agent mistral-vibe"
+        assert agent.name == "invoke_agent glider-code"
         assert agent.status.status_code == StatusCode.OK
         agent_attrs = dict(agent.attributes)
         assert agent_attrs["gen_ai.operation.name"] == "invoke_agent"
         assert agent_attrs["gen_ai.provider.name"] == "mistral_ai"
-        assert agent_attrs["gen_ai.agent.name"] == "mistral-vibe"
-        assert agent_attrs["gen_ai.request.model"] == "mistral-vibe-cli-latest"
+        assert agent_attrs["gen_ai.agent.name"] == "glider-code"
+        assert agent_attrs["gen_ai.request.model"] == "glider-code-cli-latest"
         assert agent_attrs["gen_ai.conversation.id"] == agent_loop.session_id
 
         # -- Tool span: name, status, and every attribute set by tool_span() + set_tool_result() --

@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import pytest
 
-from tests.conftest import build_test_vibe_config
+from tests.conftest import build_test_glider_config
 from tests.mock.mock_backend_factory import mock_backend_factory
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
-from vibe.core import run_programmatic
-from vibe.core.types import Backend, LLMMessage, OutputFormat, Role
+from glider.core import run_programmatic
+from glider.core.types import Backend, LLMMessage, OutputFormat, Role
 
 
 class SpyStreamingFormatter:
@@ -40,7 +40,7 @@ def test_run_programmatic_preload_streaming_is_batched(
             )
         ),
     ):
-        cfg = build_test_vibe_config(
+        cfg = build_test_glider_config(
             system_prompt_id="tests",
             include_project_context=False,
             include_prompt_detail=False,
@@ -78,14 +78,14 @@ def test_run_programmatic_preload_streaming_is_batched(
         ]
 
         new_session = [
-            e for e in telemetry_events if e.get("event_name") == "vibe.new_session"
+            e for e in telemetry_events if e.get("event_name") == "glider.new_session"
         ]
         assert len(new_session) == 1
         assert new_session[0]["properties"]["entrypoint"] == "programmatic"
         assert "version" in new_session[0]["properties"]
 
         assert (
-            spy.emitted[0][1] == "You are Vibe, a super useful programming assistant."
+            spy.emitted[0][1] == "You are Glider, a super useful programming assistant."
         )
         assert spy.emitted[1][1] == "Previously, you told me about decorators."
         assert spy.emitted[2][1] == "Sure, decorators allow you to wrap functions."
@@ -108,7 +108,7 @@ def test_run_programmatic_ignores_system_messages_in_previous(
         Backend.MISTRAL,
         lambda provider, **kwargs: FakeBackend([mock_llm_chunk(content="Understood.")]),
     ):
-        cfg = build_test_vibe_config(
+        cfg = build_test_glider_config(
             system_prompt_id="tests",
             include_project_context=False,
             include_prompt_detail=False,
@@ -136,7 +136,7 @@ def test_run_programmatic_ignores_system_messages_in_previous(
         roles = [r for r, _ in spy.emitted]
         assert roles == [Role.system, Role.user, Role.user, Role.assistant]
         assert (
-            spy.emitted[0][1] == "You are Vibe, a super useful programming assistant."
+            spy.emitted[0][1] == "You are Glider, a super useful programming assistant."
         )
         assert spy.emitted[1][1] == "Continue our previous discussion."
         assert spy.emitted[2][1] == "Let's move on to practical examples."
@@ -157,7 +157,7 @@ def test_run_programmatic_teleport_ignored_when_nuage_disabled(
             mock_llm_chunk(content="Normal response.")
         ]),
     ):
-        cfg = build_test_vibe_config(
+        cfg = build_test_glider_config(
             system_prompt_id="tests",
             include_project_context=False,
             include_prompt_detail=False,

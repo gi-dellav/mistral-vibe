@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from vibe.cli.textual_ui.remote.remote_session_manager import RemoteSessionManager
-from vibe.core.tools.builtins.ask_user_question import AskUserQuestionArgs
-from vibe.core.types import WaitingForInputEvent
+from glider.cli.textual_ui.remote.remote_session_manager import RemoteSessionManager
+from glider.core.tools.builtins.ask_user_question import AskUserQuestionArgs
+from glider.core.types import WaitingForInputEvent
 
 
 @pytest.fixture

@@ -5,29 +5,29 @@ from typing import Any, cast
 
 from textual.pilot import Pilot
 
-from tests.conftest import build_test_vibe_config
+from tests.conftest import build_test_glider_config
 from tests.mock.utils import mock_llm_chunk
 from tests.snapshots.base_snapshot_test_app import BaseSnapshotTestApp
 from tests.snapshots.snap_compare import SnapCompare
 from tests.stubs.fake_audio_player import FakeAudioPlayer
 from tests.stubs.fake_backend import FakeBackend
 from tests.stubs.fake_tts_client import FakeTTSClient
-from vibe.cli.narrator_manager import NarratorManager, NarratorState
-import vibe.cli.textual_ui.widgets.narrator_status as narrator_status_mod
-from vibe.cli.textual_ui.widgets.narrator_status import NarratorStatus
-from vibe.cli.turn_summary import TurnSummaryTracker
+from glider.cli.narrator_manager import NarratorManager, NarratorState
+import glider.cli.textual_ui.widgets.narrator_status as narrator_status_mod
+from glider.cli.textual_ui.widgets.narrator_status import NarratorStatus
+from glider.cli.turn_summary import TurnSummaryTracker
 
 narrator_status_mod.SHRINK_FRAMES = "█"
 narrator_status_mod.BAR_FRAMES = ["▂▅▇"]
-from vibe.core.config import ModelConfig
-from vibe.core.tts.tts_client_port import TTSResult
-from vibe.core.types import LLMChunk
+from glider.core.config import ModelConfig
+from glider.core.tts.tts_client_port import TTSResult
+from glider.core.types import LLMChunk
 
 _TEST_MODEL = ModelConfig(name="test-model", provider="test", alias="test-model")
 
 
 def _narrator_config():
-    return build_test_vibe_config(
+    return build_test_glider_config(
         narrator_enabled=True,
         disable_welcome_banner_animation=True,
         displayed_workdir="/test/workdir",

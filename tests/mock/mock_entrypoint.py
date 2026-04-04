@@ -14,14 +14,14 @@ from unittest.mock import patch
 
 from pydantic import ValidationError
 
-from vibe.core.config.harness_files import init_harness_files_manager
+from glider.core.config.harness_files import init_harness_files_manager
 
 if __name__ == "__main__":
     init_harness_files_manager("user", "project")
 
     from tests import TESTS_ROOT
     from tests.mock.utils import MOCK_DATA_ENV_VAR
-    from vibe.core.types import LLMChunk
+    from glider.core.types import LLMChunk
 
     sys.path.insert(0, str(TESTS_ROOT))
 
@@ -60,6 +60,6 @@ if __name__ == "__main__":
         side_effect=mock_complete_streaming,
     ).start()
 
-    from vibe.acp.entrypoint import main
+    from glider.acp.entrypoint import main
 
     main()

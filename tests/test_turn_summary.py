@@ -8,16 +8,16 @@ import pytest
 
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
-from vibe.cli.turn_summary import (
+from glider.cli.turn_summary import (
     NARRATOR_MODEL,
     NoopTurnSummary,
     TurnSummaryResult,
     TurnSummaryTracker,
     create_narrator_backend,
 )
-from vibe.core.config import ModelConfig, ProviderConfig, VibeConfig
-from vibe.core.llm.backend.mistral import MistralBackend
-from vibe.core.types import AssistantEvent, Backend, ToolStreamEvent, UserMessageEvent
+from glider.core.config import ModelConfig, ProviderConfig, GliderConfig
+from glider.core.llm.backend.mistral import MistralBackend
+from glider.core.types import AssistantEvent, Backend, ToolStreamEvent, UserMessageEvent
 
 _TEST_MODEL = ModelConfig(name="test-model", provider="test", alias="test-model")
 
@@ -29,7 +29,7 @@ def _noop_callback(result: TurnSummaryResult) -> None:
 class TestCreateNarratorBackend:
     def test_uses_mistral_provider(self, monkeypatch):
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
-        config = VibeConfig()
+        config = GliderConfig()
         result = create_narrator_backend(config)
         assert result is not None
         backend, model = result
@@ -44,7 +44,7 @@ class TestCreateNarratorBackend:
             api_key_env_var="MISTRAL_API_KEY",
             backend=Backend.MISTRAL,
         )
-        config = VibeConfig(providers=[custom_provider])
+        config = GliderConfig(providers=[custom_provider])
         result = create_narrator_backend(config)
         assert result is not None
         backend, model = result
@@ -53,12 +53,12 @@ class TestCreateNarratorBackend:
 
     def test_returns_none_when_api_key_missing(self, monkeypatch):
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
-        config = VibeConfig()
+        config = GliderConfig()
         monkeypatch.delenv("MISTRAL_API_KEY")
         assert create_narrator_backend(config) is None
 
     def test_returns_none_when_provider_missing(self):
-        config = VibeConfig(providers=[])
+        config = GliderConfig(providers=[])
         assert create_narrator_backend(config) is None
 
 
@@ -245,7 +245,7 @@ class TestTurnSummaryTracker:
         backend = FakeBackend(exception_to_raise=RuntimeError("backend down"))
         tracker = self._make_tracker(backend)
 
-        with caplog.at_level(logging.WARNING, logger="vibe"):
+        with caplog.at_level(logging.WARNING, logger="glider"):
             tracker.start_turn("hello")
             tracker.end_turn()
             await asyncio.sleep(0.2)

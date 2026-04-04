@@ -4,9 +4,9 @@ import json
 
 import pytest
 
-from vibe.core.config import ProviderConfig
-from vibe.core.llm.backend.anthropic import AnthropicAdapter, AnthropicMapper
-from vibe.core.types import (
+from glider.core.config import ProviderConfig
+from glider.core.llm.backend.anthropic import AnthropicAdapter, AnthropicMapper
+from glider.core.types import (
     AvailableFunction,
     AvailableTool,
     FunctionCall,

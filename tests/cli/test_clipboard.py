@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, mock_open, patch
 import pytest
 from textual.app import App
 
-from vibe.cli.clipboard import (
+from glider.cli.clipboard import (
     _copy_osc52,
     _copy_pbcopy,
     _copy_to_clipboard,
@@ -287,7 +287,7 @@ def test_copy_methods_includes_available_commands() -> None:
     """_COPY_METHODS is built at import time using _has_cmd; re-import with mocked shutil.which."""
     import importlib
 
-    import vibe.cli.clipboard as mod
+    import glider.cli.clipboard as mod
 
     with patch(
         "shutil.which",

@@ -13,11 +13,11 @@ from pathlib import Path
 
 import pytest
 
-from tests.conftest import build_test_agent_loop, build_test_vibe_config
+from tests.conftest import build_test_agent_loop, build_test_glider_config
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
-from vibe.core.agents.models import BuiltinAgentName
-from vibe.core.types import BaseEvent, FunctionCall, ToolCall
+from glider.core.agents.models import BuiltinAgentName
+from glider.core.types import BaseEvent, FunctionCall, ToolCall
 
 
 async def _act_and_collect(agent_loop, prompt: str) -> list[BaseEvent]:
@@ -53,7 +53,7 @@ def _bash_tool_call(command: str, *, call_id: str = "call_1") -> ToolCall:
 
 
 def _make_agent_loop(backend: FakeBackend):
-    config = build_test_vibe_config(
+    config = build_test_glider_config(
         enabled_tools=["write_file", "search_replace", "bash"],
         tools={
             "write_file": {"permission": "always"},

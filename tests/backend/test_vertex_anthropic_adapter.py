@@ -5,14 +5,14 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
-from vibe.core.config import ProviderConfig
-from vibe.core.llm.backend.vertex import (
+from glider.core.config import ProviderConfig
+from glider.core.llm.backend.vertex import (
     VertexAnthropicAdapter,
     VertexCredentials,
     build_vertex_base_url,
     build_vertex_endpoint,
 )
-from vibe.core.types import AvailableFunction, AvailableTool, LLMMessage, Role
+from glider.core.types import AvailableFunction, AvailableTool, LLMMessage, Role
 
 
 @pytest.fixture

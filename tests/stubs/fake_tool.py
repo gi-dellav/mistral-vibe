@@ -4,8 +4,8 @@ from collections.abc import AsyncGenerator
 
 from pydantic import BaseModel
 
-from vibe.core.tools.base import BaseTool, BaseToolConfig, BaseToolState, InvokeContext
-from vibe.core.types import ToolStreamEvent
+from glider.core.tools.base import BaseTool, BaseToolConfig, BaseToolState, InvokeContext
+from glider.core.types import ToolStreamEvent
 
 
 class FakeToolArgs(BaseModel):

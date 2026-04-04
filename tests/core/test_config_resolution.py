@@ -6,15 +6,15 @@ import tomllib
 import pytest
 import tomli_w
 
-from tests.conftest import build_test_vibe_config
-from vibe.core.config import ModelConfig, VibeConfig
-from vibe.core.config.harness_files import (
+from tests.conftest import build_test_glider_config
+from glider.core.config import ModelConfig, GliderConfig
+from glider.core.config.harness_files import (
     HarnessFilesManager,
     init_harness_files_manager,
     reset_harness_files_manager,
 )
-from vibe.core.paths import VIBE_HOME
-from vibe.core.trusted_folders import trusted_folders_manager
+from glider.core.paths import GLIDER_HOME
+from glider.core.trusted_folders import trusted_folders_manager
 
 
 class TestResolveConfigFile:
@@ -22,7 +22,7 @@ class TestResolveConfigFile:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.chdir(tmp_path)
-        local_config_dir = tmp_path / ".vibe"
+        local_config_dir = tmp_path / ".glider"
         local_config_dir.mkdir()
         local_config = local_config_dir / "config.toml"
         local_config.write_text('active_model = "test"', encoding="utf-8")
@@ -31,7 +31,7 @@ class TestResolveConfigFile:
 
         reset_harness_files_manager()
         init_harness_files_manager("user", "project")
-        from vibe.core.config.harness_files import get_harness_files_manager
+        from glider.core.config.harness_files import get_harness_files_manager
 
         mgr = get_harness_files_manager()
         resolved = mgr.config_file
@@ -44,38 +44,38 @@ class TestResolveConfigFile:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.chdir(tmp_path)
-        local_config_dir = tmp_path / ".vibe"
+        local_config_dir = tmp_path / ".glider"
         local_config_dir.mkdir()
         local_config = local_config_dir / "config.toml"
         local_config.write_text('active_model = "test"', encoding="utf-8")
 
         reset_harness_files_manager()
         init_harness_files_manager("user", "project")
-        from vibe.core.config.harness_files import get_harness_files_manager
+        from glider.core.config.harness_files import get_harness_files_manager
 
         mgr = get_harness_files_manager()
-        assert mgr.config_file == VIBE_HOME.path / "config.toml"
+        assert mgr.config_file == GLIDER_HOME.path / "config.toml"
 
     def test_falls_back_to_global_config_when_local_missing(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.chdir(tmp_path)
         # Ensure no local config exists
-        assert not (tmp_path / ".vibe" / "config.toml").exists()
+        assert not (tmp_path / ".glider" / "config.toml").exists()
 
         reset_harness_files_manager()
         init_harness_files_manager("user", "project")
-        from vibe.core.config.harness_files import get_harness_files_manager
+        from glider.core.config.harness_files import get_harness_files_manager
 
         mgr = get_harness_files_manager()
-        assert mgr.config_file == VIBE_HOME.path / "config.toml"
+        assert mgr.config_file == GLIDER_HOME.path / "config.toml"
 
-    def test_respects_vibe_home_env_var(
+    def test_respects_glider_home_env_var(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        assert VIBE_HOME.path != tmp_path
-        monkeypatch.setenv("VIBE_HOME", str(tmp_path))
-        assert VIBE_HOME.path == tmp_path
+        assert GLIDER_HOME.path != tmp_path
+        monkeypatch.setenv("GLIDER_HOME", str(tmp_path))
+        assert GLIDER_HOME.path == tmp_path
 
     def test_returns_none_when_no_sources(self) -> None:
         mgr = HarnessFilesManager(sources=())
@@ -83,14 +83,14 @@ class TestResolveConfigFile:
 
     def test_user_only_returns_global_config(self) -> None:
         mgr = HarnessFilesManager(sources=("user",))
-        assert mgr.config_file == VIBE_HOME.path / "config.toml"
+        assert mgr.config_file == GLIDER_HOME.path / "config.toml"
 
 
 class TestMigrateRemovesFindFromBashAllowlist:
     def test_removes_find_from_config_file(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        monkeypatch.setenv("VIBE_HOME", str(tmp_path))
+        monkeypatch.setenv("GLIDER_HOME", str(tmp_path))
         config_file = tmp_path / "config.toml"
         data = {"tools": {"bash": {"allowlist": ["echo", "find", "ls"]}}}
         with config_file.open("wb") as f:
@@ -98,7 +98,7 @@ class TestMigrateRemovesFindFromBashAllowlist:
 
         reset_harness_files_manager()
         init_harness_files_manager("user")
-        VibeConfig._migrate()
+        GliderConfig._migrate()
 
         with config_file.open("rb") as f:
             result = tomllib.load(f)
@@ -108,7 +108,7 @@ class TestMigrateRemovesFindFromBashAllowlist:
     def test_noop_when_find_not_present(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        monkeypatch.setenv("VIBE_HOME", str(tmp_path))
+        monkeypatch.setenv("GLIDER_HOME", str(tmp_path))
         config_file = tmp_path / "config.toml"
         data = {"tools": {"bash": {"allowlist": ["echo", "ls"]}}}
         with config_file.open("wb") as f:
@@ -116,7 +116,7 @@ class TestMigrateRemovesFindFromBashAllowlist:
 
         reset_harness_files_manager()
         init_harness_files_manager("user")
-        VibeConfig._migrate()
+        GliderConfig._migrate()
 
         with config_file.open("rb") as f:
             result = tomllib.load(f)
@@ -125,7 +125,7 @@ class TestMigrateRemovesFindFromBashAllowlist:
     def test_noop_when_no_bash_tools_section(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        monkeypatch.setenv("VIBE_HOME", str(tmp_path))
+        monkeypatch.setenv("GLIDER_HOME", str(tmp_path))
         config_file = tmp_path / "config.toml"
         data = {"active_model": "test"}
         with config_file.open("wb") as f:
@@ -133,7 +133,7 @@ class TestMigrateRemovesFindFromBashAllowlist:
 
         reset_harness_files_manager()
         init_harness_files_manager("user")
-        VibeConfig._migrate()
+        GliderConfig._migrate()
 
         with config_file.open("rb") as f:
             result = tomllib.load(f)
@@ -143,7 +143,7 @@ class TestMigrateRemovesFindFromBashAllowlist:
 class TestAutoCompactThresholdFallback:
     def test_model_without_explicit_threshold_inherits_global(self) -> None:
         model = ModelConfig(name="m", provider="p", alias="m")
-        cfg = build_test_vibe_config(
+        cfg = build_test_glider_config(
             auto_compact_threshold=42_000, models=[model], active_model="m"
         )
         assert cfg.get_active_model().auto_compact_threshold == 42_000
@@ -152,26 +152,26 @@ class TestAutoCompactThresholdFallback:
         model = ModelConfig(
             name="m", provider="p", alias="m", auto_compact_threshold=99_000
         )
-        cfg = build_test_vibe_config(
+        cfg = build_test_glider_config(
             auto_compact_threshold=42_000, models=[model], active_model="m"
         )
         assert cfg.get_active_model().auto_compact_threshold == 99_000
 
     def test_default_global_threshold_used_when_nothing_set(self) -> None:
         model = ModelConfig(name="m", provider="p", alias="m")
-        cfg = build_test_vibe_config(models=[model], active_model="m")
+        cfg = build_test_glider_config(models=[model], active_model="m")
         assert cfg.get_active_model().auto_compact_threshold == 200_000
 
     def test_changed_global_threshold_propagates_on_reload(self) -> None:
         model = ModelConfig(name="m", provider="p", alias="m")
 
-        cfg1 = build_test_vibe_config(
+        cfg1 = build_test_glider_config(
             auto_compact_threshold=50_000, models=[model], active_model="m"
         )
         assert cfg1.get_active_model().auto_compact_threshold == 50_000
 
         # Simulate config reload with a different global threshold
-        cfg2 = build_test_vibe_config(
+        cfg2 = build_test_glider_config(
             auto_compact_threshold=75_000, models=[model], active_model="m"
         )
         assert cfg2.get_active_model().auto_compact_threshold == 75_000
@@ -179,18 +179,18 @@ class TestAutoCompactThresholdFallback:
 
 class TestCompactionModel:
     def test_get_compaction_model_returns_active_when_unset(self) -> None:
-        cfg = build_test_vibe_config()
+        cfg = build_test_glider_config()
         assert cfg.get_compaction_model() == cfg.get_active_model()
 
     def test_get_compaction_model_returns_configured_model(self) -> None:
         compaction = ModelConfig(
             name="compact-model", provider="mistral", alias="compact"
         )
-        cfg = build_test_vibe_config(compaction_model=compaction)
+        cfg = build_test_glider_config(compaction_model=compaction)
         assert cfg.get_compaction_model().name == "compact-model"
 
     def test_compaction_model_provider_must_match_active(self) -> None:
-        from vibe.core.config import ProviderConfig
+        from glider.core.config import ProviderConfig
 
         compaction = ModelConfig(
             name="compact-model", provider="other", alias="compact"
@@ -208,7 +208,7 @@ class TestCompactionModel:
             ),
         ]
         with pytest.raises(ValueError, match="must share the same provider"):
-            build_test_vibe_config(compaction_model=compaction, providers=providers)
+            build_test_glider_config(compaction_model=compaction, providers=providers)
 
     def test_compaction_model_provider_must_exist(self) -> None:
         compaction = ModelConfig(
@@ -218,9 +218,9 @@ class TestCompactionModel:
             ValueError,
             match="Provider 'missing-provider' for model 'compact-model' not found in configuration",
         ):
-            build_test_vibe_config(compaction_model=compaction)
+            build_test_glider_config(compaction_model=compaction)
 
     def test_compaction_model_excluded_from_model_dump_when_none(self) -> None:
-        cfg = build_test_vibe_config()
+        cfg = build_test_glider_config()
         dumped = cfg.model_dump()
         assert "compaction_model" not in dumped

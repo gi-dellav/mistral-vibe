@@ -36,14 +36,14 @@ from tests.backend.data.mistral import (
     STREAMED_TOOL_CONVERSATION_PARAMS as MISTRAL_STREAMED_TOOL_CONVERSATION_PARAMS,
     TOOL_CONVERSATION_PARAMS as MISTRAL_TOOL_CONVERSATION_PARAMS,
 )
-from vibe.core.config import ModelConfig, ProviderConfig
-from vibe.core.llm.backend.factory import BACKEND_FACTORY
-from vibe.core.llm.backend.generic import GenericBackend
-from vibe.core.llm.backend.mistral import MistralBackend, MistralMapper
-from vibe.core.llm.exceptions import BackendError, BackendErrorBuilder
-from vibe.core.llm.types import BackendLike
-from vibe.core.types import Backend, FunctionCall, LLMChunk, LLMMessage, Role, ToolCall
-from vibe.core.utils import get_user_agent
+from glider.core.config import ModelConfig, ProviderConfig
+from glider.core.llm.backend.factory import BACKEND_FACTORY
+from glider.core.llm.backend.generic import GenericBackend
+from glider.core.llm.backend.mistral import MistralBackend, MistralMapper
+from glider.core.llm.exceptions import BackendError, BackendErrorBuilder
+from glider.core.llm.types import BackendLike
+from glider.core.types import Backend, FunctionCall, LLMChunk, LLMMessage, Role, ToolCall
+from glider.core.utils import get_user_agent
 
 
 class TestBackend:

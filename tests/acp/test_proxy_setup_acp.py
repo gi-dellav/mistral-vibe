@@ -8,15 +8,15 @@ from acp.schema import AgentMessageChunk, AvailableCommandsUpdate, TextContentBl
 import pytest
 
 from tests.acp.conftest import _create_acp_agent
-from tests.conftest import build_test_vibe_config
+from tests.conftest import build_test_glider_config
 from tests.stubs.fake_client import FakeClient
-from vibe.acp.acp_agent_loop import VibeAcpAgentLoop
-from vibe.core.agent_loop import AgentLoop
+from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.core.agent_loop import AgentLoop
 
 
 @pytest.fixture
 def acp_agent_loop(backend) -> VibeAcpAgentLoop:
-    config = build_test_vibe_config()
+    config = build_test_glider_config()
 
     class PatchedAgentLoop(AgentLoop):
         def __init__(self, *args, **kwargs) -> None:

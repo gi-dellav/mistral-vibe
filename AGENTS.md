@@ -137,6 +137,6 @@ guidelines:
   - title: "Imports in Cursor (no Pylance)"
     description: >
       Cursor's built-in Pyright does not offer the "Add import" quick fix (Ctrl+.). To add a missing import:
-      - Use the workspace snippets: type the prefix (e.g. acpschema, acphelpers, vibetypes, vibeconfig) and accept the suggestion to insert the import line, then change the symbol name.
+      - Use the workspace snippets: type the prefix (e.g. acpschema, acphelpers, glidertypes, gliderconfig) and accept the suggestion to insert the import line, then change the symbol name.
       - Or ask Cursor: select the undefined symbol, then Cmd+K and request "Add the missing import for <symbol>".
-      - Or copy the import from an existing file in the repo (e.g. acp.schema, acp.helpers, vibe.core.*).
+      - Or copy the import from an existing file in the repo (e.g. acp.schema, acp.helpers, glider.core.*).

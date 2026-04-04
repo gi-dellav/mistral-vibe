@@ -14,10 +14,10 @@ from mistralai.client.models import (
 import pytest
 
 from tests.mock.utils import collect_result
-from vibe.core.config import ProviderConfig
-from vibe.core.tools.base import BaseToolState, InvokeContext, ToolError
-from vibe.core.tools.builtins.websearch import WebSearch, WebSearchArgs, WebSearchConfig
-from vibe.core.types import Backend
+from glider.core.config import ProviderConfig
+from glider.core.tools.base import BaseToolState, InvokeContext, ToolError
+from glider.core.tools.builtins.websearch import WebSearch, WebSearchArgs, WebSearchConfig
+from glider.core.types import Backend
 
 
 def _make_response(

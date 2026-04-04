@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 import pytest
 
-from tests.conftest import build_test_vibe_app, build_test_vibe_config
-from vibe.cli.textual_ui.app import BottomApp
-from vibe.cli.textual_ui.widgets.config_app import ConfigApp
-from vibe.cli.textual_ui.widgets.model_picker import ModelPickerApp
-from vibe.core.config._settings import ModelConfig
+from tests.conftest import build_test_glider_app, build_test_glider_config
+from glider.cli.textual_ui.app import BottomApp
+from glider.cli.textual_ui.widgets.config_app import ConfigApp
+from glider.cli.textual_ui.widgets.model_picker import ModelPickerApp
+from glider.core.config._settings import ModelConfig
 
 
 def _make_config_with_models():
@@ -17,7 +17,7 @@ def _make_config_with_models():
         ModelConfig(name="model-b", provider="mistral", alias="beta"),
         ModelConfig(name="model-c", provider="mistral", alias="gamma"),
     ]
-    return build_test_vibe_config(models=models, active_model="alpha")
+    return build_test_glider_config(models=models, active_model="alpha")
 
 
 # --- /config command ---
@@ -25,7 +25,7 @@ def _make_config_with_models():
 
 @pytest.mark.asyncio
 async def test_config_opens_config_app() -> None:
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_config()
@@ -37,7 +37,7 @@ async def test_config_opens_config_app() -> None:
 
 @pytest.mark.asyncio
 async def test_config_escape_returns_to_input() -> None:
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_config()
@@ -54,7 +54,7 @@ async def test_config_escape_returns_to_input() -> None:
 async def test_config_toggle_autocopy() -> None:
     config = _make_config_with_models()
     config.autocopy_to_clipboard = False
-    app = build_test_vibe_app(config=config)
+    app = build_test_glider_app(config=config)
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_config()
@@ -74,7 +74,7 @@ async def test_config_toggle_autocopy() -> None:
 async def test_config_escape_saves_changes() -> None:
     config = _make_config_with_models()
     config.autocopy_to_clipboard = False
-    app = build_test_vibe_app(config=config)
+    app = build_test_glider_app(config=config)
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_config()
@@ -85,7 +85,7 @@ async def test_config_escape_saves_changes() -> None:
         await pilot.press("enter")
         await pilot.pause(0.1)
 
-        with patch("vibe.cli.textual_ui.app.VibeConfig.save_updates") as mock_save:
+        with patch("vibe.cli.textual_ui.app.GliderConfig.save_updates") as mock_save:
             await pilot.press("escape")
             await pilot.pause(0.2)
 
@@ -99,7 +99,7 @@ async def test_config_escape_saves_changes() -> None:
 
 @pytest.mark.asyncio
 async def test_model_opens_model_picker() -> None:
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_model()
@@ -111,7 +111,7 @@ async def test_model_opens_model_picker() -> None:
 
 @pytest.mark.asyncio
 async def test_model_picker_shows_all_models() -> None:
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_model()
@@ -124,7 +124,7 @@ async def test_model_picker_shows_all_models() -> None:
 
 @pytest.mark.asyncio
 async def test_model_picker_escape_returns_to_input() -> None:
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_model()
@@ -139,13 +139,13 @@ async def test_model_picker_escape_returns_to_input() -> None:
 
 @pytest.mark.asyncio
 async def test_model_picker_escape_does_not_save() -> None:
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_model()
         await pilot.pause(0.2)
 
-        with patch("vibe.cli.textual_ui.app.VibeConfig.save_updates") as mock_save:
+        with patch("vibe.cli.textual_ui.app.GliderConfig.save_updates") as mock_save:
             await pilot.press("escape")
             await pilot.pause(0.2)
 
@@ -154,7 +154,7 @@ async def test_model_picker_escape_does_not_save() -> None:
 
 @pytest.mark.asyncio
 async def test_model_picker_select_model() -> None:
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_model()
@@ -162,7 +162,7 @@ async def test_model_picker_select_model() -> None:
 
         # Navigate down to "beta" and select
         await pilot.press("down")
-        with patch("vibe.cli.textual_ui.app.VibeConfig.save_updates") as mock_save:
+        with patch("vibe.cli.textual_ui.app.GliderConfig.save_updates") as mock_save:
             await pilot.press("enter")
             await pilot.pause(0.2)
 
@@ -175,13 +175,13 @@ async def test_model_picker_select_model() -> None:
 @pytest.mark.asyncio
 async def test_model_picker_select_current_model() -> None:
     """Selecting the already-active model still saves (idempotent)."""
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_model()
         await pilot.pause(0.2)
 
-        with patch("vibe.cli.textual_ui.app.VibeConfig.save_updates") as mock_save:
+        with patch("vibe.cli.textual_ui.app.GliderConfig.save_updates") as mock_save:
             await pilot.press("enter")
             await pilot.pause(0.2)
 
@@ -196,7 +196,7 @@ async def test_model_picker_select_current_model() -> None:
 @pytest.mark.asyncio
 async def test_config_model_entry_opens_model_picker() -> None:
     """Pressing Enter on the Model row in /config opens the model picker."""
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_config()
@@ -214,7 +214,7 @@ async def test_config_model_entry_opens_model_picker() -> None:
 @pytest.mark.asyncio
 async def test_config_to_model_picker_escape_returns_to_input() -> None:
     """Opening model picker from config, then ESC, returns to input (not config)."""
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_config()
@@ -236,7 +236,7 @@ async def test_config_to_model_picker_escape_returns_to_input() -> None:
 @pytest.mark.asyncio
 async def test_config_to_model_picker_select_returns_to_input() -> None:
     """Opening model picker from config, selecting a model, returns to input."""
-    app = build_test_vibe_app(config=_make_config_with_models())
+    app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_config()
@@ -248,7 +248,7 @@ async def test_config_to_model_picker_select_returns_to_input() -> None:
 
         # Select second model
         await pilot.press("down")
-        with patch("vibe.cli.textual_ui.app.VibeConfig.save_updates") as mock_save:
+        with patch("vibe.cli.textual_ui.app.GliderConfig.save_updates") as mock_save:
             await pilot.press("enter")
             await pilot.pause(0.2)
 
@@ -262,7 +262,7 @@ async def test_config_pending_changes_saved_before_model_picker() -> None:
     """Toggle changes in config are saved before switching to model picker."""
     config = _make_config_with_models()
     config.autocopy_to_clipboard = False
-    app = build_test_vibe_app(config=config)
+    app = build_test_glider_app(config=config)
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
         await app._show_config()
@@ -275,7 +275,7 @@ async def test_config_pending_changes_saved_before_model_picker() -> None:
 
         # Go back up to model row and open model picker
         await pilot.press("up")
-        with patch("vibe.cli.textual_ui.app.VibeConfig.save_updates") as mock_save:
+        with patch("vibe.cli.textual_ui.app.GliderConfig.save_updates") as mock_save:
             await pilot.press("enter")
             await pilot.pause(0.3)
 

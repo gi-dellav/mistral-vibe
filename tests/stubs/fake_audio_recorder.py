@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncGenerator, Callable
 
-from vibe.core.audio_recorder import (
+from glider.core.audio_recorder import (
     AlreadyRecordingError,
     AudioRecording,
     RecordingMode,

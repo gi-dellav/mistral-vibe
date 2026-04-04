@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from vibe.core.session.resume_sessions import (
+from glider.core.session.resume_sessions import (
     SHORT_SESSION_ID_LEN,
     list_remote_resume_sessions,
     short_session_id,
@@ -66,28 +66,28 @@ class TestListRemoteResumeSessions:
     async def test_filters_only_active_statuses(self) -> None:
         from datetime import datetime
 
-        from vibe.core.nuage.workflow import (
+        from glider.core.nuage.workflow import (
             WorkflowExecutionListResponse,
             WorkflowExecutionStatus,
             WorkflowExecutionWithoutResultResponse,
         )
 
         running = WorkflowExecutionWithoutResultResponse(
-            workflow_name="vibe",
+            workflow_name="glider",
             execution_id="exec-running",
             status=WorkflowExecutionStatus.RUNNING,
             start_time=datetime(2026, 1, 1),
             end_time=None,
         )
         completed = WorkflowExecutionWithoutResultResponse(
-            workflow_name="vibe",
+            workflow_name="glider",
             execution_id="exec-completed",
             status=WorkflowExecutionStatus.COMPLETED,
             start_time=datetime(2026, 1, 1),
             end_time=datetime(2026, 1, 2),
         )
         retrying = WorkflowExecutionWithoutResultResponse(
-            workflow_name="vibe",
+            workflow_name="glider",
             execution_id="exec-retrying",
             status=WorkflowExecutionStatus.RETRYING_AFTER_ERROR,
             start_time=datetime(2026, 1, 1),

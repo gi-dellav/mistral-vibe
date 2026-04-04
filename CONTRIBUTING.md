@@ -1,10 +1,10 @@
-# Contributing to Mistral Vibe
+# Contributing to Glider for Mistral
 
-Thank you for your interest in Mistral Vibe! We appreciate your enthusiasm and support.
+Thank you for your interest in Glider for Mistral! We appreciate your enthusiasm and support.
 
 ## Current Status
 
-**Mistral Vibe is in active development** — our team is iterating quickly and making lots of changes under the hood. Because of this pace, we may be slower than usual when reviewing PRs and issues.
+**Glider for Mistral is in active development** — our team is iterating quickly and making lots of changes under the hood. Because of this pace, we may be slower than usual when reviewing PRs and issues.
 
 **We especially encourage**:
 
@@ -25,7 +25,7 @@ If you encounter a bug, please open an issue with the following information:
 5. **Environment**:
    - Python version
    - Operating system
-   - Vibe version
+   - Glider version
 6. **Error Messages**: Any error messages or stack traces
 7. **Configuration**: Relevant parts of your `config.toml` (redact any sensitive information)
 
@@ -53,7 +53,7 @@ This section is for developers who want to set up the repository for local devel
 
    ```bash
    git clone <repository-url>
-   cd mistral-vibe
+   cd mistral-glider
    ```
 
 2. Install dependencies:
@@ -74,7 +74,7 @@ This section is for developers who want to set up the repository for local devel
 
 ### Logging Configuration
 
-Logs are written to `~/.vibe/logs/vibe.log` by default. Control logging via environment variables:
+Logs are written to `~/.glider/logs/glider.log` by default. Control logging via environment variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -85,7 +85,7 @@ Logs are written to `~/.vibe/logs/vibe.log` by default. Control logging via envi
 Example:
 
 ```bash
-LOG_LEVEL=DEBUG uv run vibe
+LOG_LEVEL=DEBUG uv run glider
 ```
 
 ### Running Tests
@@ -180,6 +180,6 @@ While we're not accepting code contributions at the moment, we may open up contr
 
 ## Questions?
 
-If you have questions about using Mistral Vibe, please check the [README](README.md) first. For other inquiries, feel free to open a discussion or issue.
+If you have questions about using Glider for Mistral, please check the [README](README.md) first. For other inquiries, feel free to open a discussion or issue.
 
-Thank you for helping make Mistral Vibe better! 🙏
+Thank you for helping make Glider for Mistral better! 🙏

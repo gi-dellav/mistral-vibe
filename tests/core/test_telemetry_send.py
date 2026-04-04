@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from tests.conftest import build_test_vibe_config
+from tests.conftest import build_test_glider_config
 from tests.stubs.fake_tool import FakeTool, FakeToolArgs
-from vibe.core.agent_loop import ToolDecision, ToolExecutionResponse
-from vibe.core.llm.format import ResolvedToolCall
-from vibe.core.telemetry.send import DATALAKE_EVENTS_URL, TelemetryClient
-from vibe.core.tools.base import BaseTool, ToolPermission
-from vibe.core.types import Backend
-from vibe.core.utils import get_user_agent
+from glider.core.agent_loop import ToolDecision, ToolExecutionResponse
+from glider.core.llm.format import ResolvedToolCall
+from glider.core.telemetry.send import DATALAKE_EVENTS_URL, TelemetryClient
+from glider.core.tools.base import BaseTool, ToolPermission
+from glider.core.types import Backend
+from glider.core.utils import get_user_agent
 
 _original_send_telemetry_event = TelemetryClient.send_telemetry_event
-from vibe.core.tools.builtins.write_file import WriteFile, WriteFileArgs
+from glider.core.tools.builtins.write_file import WriteFile, WriteFileArgs
 
 
 def _make_resolved_tool_call(
@@ -47,7 +47,7 @@ class TestTelemetryClient:
     def test_send_telemetry_event_does_nothing_when_api_key_is_none(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         env_key = config.get_provider_for_model(
             config.get_active_model()
         ).api_key_env_var
@@ -68,7 +68,7 @@ class TestTelemetryClient:
         monkeypatch.setattr(
             TelemetryClient, "send_telemetry_event", _original_send_telemetry_event
         )
-        config = build_test_vibe_config(enable_telemetry=False)
+        config = build_test_glider_config(enable_telemetry=False)
         env_key = config.get_provider_for_model(
             config.get_active_model()
         ).api_key_env_var
@@ -89,7 +89,7 @@ class TestTelemetryClient:
         monkeypatch.setattr(
             TelemetryClient, "send_telemetry_event", _original_send_telemetry_event
         )
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         env_key = config.get_provider_for_model(
             config.get_active_model()
         ).api_key_env_var
@@ -116,7 +116,7 @@ class TestTelemetryClient:
     def test_send_tool_call_finished_payload_shape(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
         tool_call = _make_resolved_tool_call("todo", {})
         decision = ToolDecision(
@@ -132,7 +132,7 @@ class TestTelemetryClient:
 
         assert len(telemetry_events) == 1
         event_name = telemetry_events[0]["event_name"]
-        assert event_name == "vibe.tool_call_finished"
+        assert event_name == "glider.tool_call_finished"
         properties = telemetry_events[0]["properties"]
         assert properties["tool_name"] == "todo"
         assert properties["status"] == "success"
@@ -145,7 +145,7 @@ class TestTelemetryClient:
     def test_send_tool_call_finished_nb_files_created_write_file_new(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
         tool_call = _make_resolved_tool_call("write_file", {"overwrite": False})
 
@@ -163,7 +163,7 @@ class TestTelemetryClient:
     def test_send_tool_call_finished_nb_files_modified_write_file_overwrite(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
         tool_call = _make_resolved_tool_call("write_file", {"overwrite": True})
 
@@ -181,7 +181,7 @@ class TestTelemetryClient:
     def test_send_tool_call_finished_decision_none(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
         tool_call = _make_resolved_tool_call("todo", {})
 
@@ -198,49 +198,49 @@ class TestTelemetryClient:
     def test_send_user_copied_text_payload(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
 
         client.send_user_copied_text("hello world")
 
         assert len(telemetry_events) == 1
-        assert telemetry_events[0]["event_name"] == "vibe.user_copied_text"
+        assert telemetry_events[0]["event_name"] == "glider.user_copied_text"
         assert telemetry_events[0]["properties"]["text_length"] == 11
 
     def test_send_user_cancelled_action_payload(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
 
         client.send_user_cancelled_action("interrupt_agent")
 
         assert len(telemetry_events) == 1
-        assert telemetry_events[0]["event_name"] == "vibe.user_cancelled_action"
+        assert telemetry_events[0]["event_name"] == "glider.user_cancelled_action"
         assert telemetry_events[0]["properties"]["action"] == "interrupt_agent"
 
     def test_send_auto_compact_triggered_payload(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
 
         client.send_auto_compact_triggered()
 
         assert len(telemetry_events) == 1
-        assert telemetry_events[0]["event_name"] == "vibe.auto_compact_triggered"
+        assert telemetry_events[0]["event_name"] == "glider.auto_compact_triggered"
 
     def test_send_slash_command_used_payload(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
 
         client.send_slash_command_used("help", "builtin")
         client.send_slash_command_used("my_skill", "skill")
 
         assert len(telemetry_events) == 2
-        assert telemetry_events[0]["event_name"] == "vibe.slash_command_used"
+        assert telemetry_events[0]["event_name"] == "glider.slash_command_used"
         assert telemetry_events[0]["properties"]["command"] == "help"
         assert telemetry_events[0]["properties"]["command_type"] == "builtin"
         assert telemetry_events[1]["properties"]["command"] == "my_skill"
@@ -249,7 +249,7 @@ class TestTelemetryClient:
     def test_send_new_session_payload(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
 
         client.send_new_session(
@@ -265,7 +265,7 @@ class TestTelemetryClient:
 
         assert len(telemetry_events) == 1
         event_name = telemetry_events[0]["event_name"]
-        assert event_name == "vibe.new_session"
+        assert event_name == "glider.new_session"
         properties = telemetry_events[0]["properties"]
         assert properties["has_agents_md"] is True
         assert properties["nb_skills"] == 2
@@ -284,7 +284,7 @@ class TestTelemetryClient:
         monkeypatch.setattr(
             TelemetryClient, "send_telemetry_event", _original_send_telemetry_event
         )
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         env_key = config.get_provider_for_model(
             config.get_active_model()
         ).api_key_env_var
@@ -321,7 +321,7 @@ class TestTelemetryClient:
         monkeypatch.setattr(
             TelemetryClient, "send_telemetry_event", _original_send_telemetry_event
         )
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         env_key = config.get_provider_for_model(
             config.get_active_model()
         ).api_key_env_var
@@ -352,7 +352,7 @@ class TestTelemetryClient:
         monkeypatch.setattr(
             TelemetryClient, "send_telemetry_event", _original_send_telemetry_event
         )
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         env_key = config.get_provider_for_model(
             config.get_active_model()
         ).api_key_env_var
@@ -380,13 +380,13 @@ class TestTelemetryClient:
     def test_send_user_rating_feedback_payload(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
 
         client.send_user_rating_feedback(rating=2, model="mistral-large")
 
         assert len(telemetry_events) == 1
-        assert telemetry_events[0]["event_name"] == "vibe.user_rating_feedback"
+        assert telemetry_events[0]["event_name"] == "glider.user_rating_feedback"
         properties = telemetry_events[0]["properties"]
         assert properties["rating"] == 2
         assert properties["model"] == "mistral-large"
@@ -395,7 +395,7 @@ class TestTelemetryClient:
     def test_send_user_rating_feedback_includes_correlation_id(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
         client.last_correlation_id = "corr-abc-123"
 
@@ -407,7 +407,7 @@ class TestTelemetryClient:
     def test_send_user_rating_feedback_omits_correlation_id_when_none(
         self, telemetry_events: list[dict[str, Any]]
     ) -> None:
-        config = build_test_vibe_config(enable_telemetry=True)
+        config = build_test_glider_config(enable_telemetry=True)
         client = TelemetryClient(config_getter=lambda: config)
 
         client.send_user_rating_feedback(rating=1, model="mistral-large")

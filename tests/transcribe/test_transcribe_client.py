@@ -5,8 +5,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from vibe.core.config import TranscribeModelConfig, TranscribeProviderConfig
-from vibe.core.transcribe import (
+from glider.core.config import TranscribeModelConfig, TranscribeProviderConfig
+from glider.core.transcribe import (
     MistralTranscribeClient,
     TranscribeDone,
     TranscribeError,

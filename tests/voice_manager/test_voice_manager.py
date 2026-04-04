@@ -4,22 +4,22 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from tests.conftest import build_test_vibe_config
+from tests.conftest import build_test_glider_config
 from tests.stubs.fake_audio_recorder import FakeAudioRecorder
 from tests.stubs.fake_transcribe_client import FakeTranscribeClient
-from vibe.cli.voice_manager.voice_manager import VoiceManager
-from vibe.cli.voice_manager.voice_manager_port import (
+from glider.cli.voice_manager.voice_manager import VoiceManager
+from glider.cli.voice_manager.voice_manager_port import (
     RecordingStartError,
     TranscribeState,
     VoiceManagerListener,
     VoiceToggleResult,
 )
-from vibe.core.audio_recorder.audio_recorder_port import (
+from glider.core.audio_recorder.audio_recorder_port import (
     AudioBackendUnavailableError,
     NoAudioInputDeviceError,
 )
-from vibe.core.config import VibeConfig
-from vibe.core.transcribe.transcribe_client_port import (
+from glider.core.config import GliderConfig
+from glider.core.transcribe.transcribe_client_port import (
     TranscribeDone,
     TranscribeError,
     TranscribeSessionCreated,
@@ -51,7 +51,7 @@ def _make_manager(
 ) -> tuple[VoiceManager, FakeAudioRecorder, FakeTranscribeClient]:
     recorder = FakeAudioRecorder()
     client = transcribe_client or FakeTranscribeClient()
-    config = build_test_vibe_config(voice_mode_enabled=voice_mode_enabled)
+    config = build_test_glider_config(voice_mode_enabled=voice_mode_enabled)
     manager = VoiceManager(
         config_getter=lambda: config,
         audio_recorder=recorder,
@@ -108,7 +108,7 @@ class TestStartRecording:
     @pytest.mark.asyncio
     async def test_start_raises_when_no_transcribe_client(self) -> None:
         recorder = FakeAudioRecorder()
-        config = build_test_vibe_config(voice_mode_enabled=True)
+        config = build_test_glider_config(voice_mode_enabled=True)
         manager = VoiceManager(
             config_getter=lambda: config,
             audio_recorder=recorder,
@@ -160,7 +160,7 @@ class TestStopRecording:
                 yield  # makes this an async generator
 
         recorder = FakeAudioRecorder()
-        config = build_test_vibe_config(voice_mode_enabled=True)
+        config = build_test_glider_config(voice_mode_enabled=True)
         manager = VoiceManager(
             config_getter=lambda: config,
             audio_recorder=recorder,
@@ -219,7 +219,7 @@ class TestCancelRecording:
                 yield
 
         recorder = FakeAudioRecorder()
-        config = build_test_vibe_config(voice_mode_enabled=True)
+        config = build_test_glider_config(voice_mode_enabled=True)
         manager = VoiceManager(
             config_getter=lambda: config,
             audio_recorder=recorder,
@@ -243,20 +243,20 @@ class TestCancelRecording:
 
 
 class TestToggleVoiceMode:
-    @patch.object(VibeConfig, "save_updates")
+    @patch.object(GliderConfig, "save_updates")
     def test_toggle_enables(self, _mock_save) -> None:
         manager, _, _ = _make_manager(voice_mode_enabled=False)
         result = manager.toggle_voice_mode()
         assert result == VoiceToggleResult(enabled=True)
 
-    @patch.object(VibeConfig, "save_updates")
+    @patch.object(GliderConfig, "save_updates")
     def test_toggle_disables(self, _mock_save) -> None:
         manager, _, _ = _make_manager(voice_mode_enabled=True)
         result = manager.toggle_voice_mode()
         assert result == VoiceToggleResult(enabled=False)
 
     @pytest.mark.asyncio
-    @patch.object(VibeConfig, "save_updates")
+    @patch.object(GliderConfig, "save_updates")
     async def test_toggle_disable_cancels_active_recording(self, _mock_save) -> None:
         manager, _, _ = _make_manager(voice_mode_enabled=True)
         manager.start_recording()
@@ -273,7 +273,7 @@ class TestListeners:
         manager.start_recording()
         assert listener.state_changes == [TranscribeState.RECORDING]
 
-    @patch.object(VibeConfig, "save_updates")
+    @patch.object(GliderConfig, "save_updates")
     def test_listener_notified_on_voice_mode_change(self, _mock_save) -> None:
         manager, _, _ = _make_manager(voice_mode_enabled=False)
         listener = StateListener()
@@ -389,7 +389,7 @@ class TestTranscription:
                 yield  # makes this an async generator
 
         recorder = FakeAudioRecorder()
-        config = build_test_vibe_config(voice_mode_enabled=True)
+        config = build_test_glider_config(voice_mode_enabled=True)
         manager = VoiceManager(
             config_getter=lambda: config,
             audio_recorder=recorder,
@@ -428,7 +428,7 @@ class TestTelemetryTracking:
         manager.start_recording()
         await manager.stop_recording()
 
-        calls = _find_telemetry_calls(mock_telemetry, "vibe.audio.transcription.start")
+        calls = _find_telemetry_calls(mock_telemetry, "glider.audio.transcription.start")
         assert len(calls) == 1
         assert calls[0]["recording_id"] == "req-123"
 
@@ -440,7 +440,7 @@ class TestTelemetryTracking:
         manager.cancel_recording()
 
         calls = _find_telemetry_calls(
-            mock_telemetry, "vibe.audio.transcription.cancel_recording"
+            mock_telemetry, "glider.audio.transcription.cancel_recording"
         )
         assert len(calls) == 1
         recording_duration_ms = calls[0]["recording_duration_ms"]
@@ -465,7 +465,7 @@ class TestTelemetryTracking:
         manager.start_recording()
         await manager.stop_recording()
 
-        calls = _find_telemetry_calls(mock_telemetry, "vibe.audio.transcription.done")
+        calls = _find_telemetry_calls(mock_telemetry, "glider.audio.transcription.done")
         assert len(calls) == 1
         assert calls[0]["recording_id"] == "test-req-id"
         assert calls[0]["transcript_length"] == len("hello ") + len("world")
@@ -489,7 +489,7 @@ class TestTelemetryTracking:
                 yield
 
         recorder = FakeAudioRecorder()
-        config = build_test_vibe_config(voice_mode_enabled=True)
+        config = build_test_glider_config(voice_mode_enabled=True)
         mock_telemetry = MagicMock()
         manager = VoiceManager(
             config_getter=lambda: config,
@@ -501,7 +501,7 @@ class TestTelemetryTracking:
         manager.start_recording()
         await asyncio.sleep(0)
 
-        calls = _find_telemetry_calls(mock_telemetry, "vibe.audio.transcription.error")
+        calls = _find_telemetry_calls(mock_telemetry, "glider.audio.transcription.error")
         assert len(calls) == 1
         error_message = calls[0]["error_message"]
         assert isinstance(error_message, str)
@@ -538,7 +538,7 @@ class TestTelemetryTracking:
         manager.start_recording()
         await manager.stop_recording()
 
-        calls = _find_telemetry_calls(mock_telemetry, "vibe.audio.transcription.start")
+        calls = _find_telemetry_calls(mock_telemetry, "glider.audio.transcription.start")
         assert len(calls) == 2
         assert calls[0]["recording_id"] == "req-first"
         assert calls[1]["recording_id"] == "req-second"
@@ -557,7 +557,7 @@ class TestTelemetryTracking:
                 yield
 
         recorder = FakeAudioRecorder()
-        config = build_test_vibe_config(voice_mode_enabled=True)
+        config = build_test_glider_config(voice_mode_enabled=True)
         mock_telemetry = MagicMock()
         manager = VoiceManager(
             config_getter=lambda: config,
@@ -572,7 +572,7 @@ class TestTelemetryTracking:
         ):
             await manager.stop_recording()
 
-        calls = _find_telemetry_calls(mock_telemetry, "vibe.audio.transcription.error")
+        calls = _find_telemetry_calls(mock_telemetry, "glider.audio.transcription.error")
         assert len(calls) == 1
         error_message = calls[0]["error_message"]
         assert isinstance(error_message, str)

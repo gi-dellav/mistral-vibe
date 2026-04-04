@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from vibe.cli.textual_ui.windowing.state import LOAD_MORE_BATCH_SIZE, SessionWindowing
-from vibe.core.types import LLMMessage, Role
+from glider.cli.textual_ui.windowing.state import LOAD_MORE_BATCH_SIZE, SessionWindowing
+from glider.core.types import LLMMessage, Role
 
 
 def _msg(

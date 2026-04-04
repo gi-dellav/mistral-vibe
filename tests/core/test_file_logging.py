@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from vibe.core.logger import StructuredLogFormatter, apply_logging_config
+from glider.core.logger import StructuredLogFormatter, apply_logging_config
 
 
 @pytest.fixture

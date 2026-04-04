@@ -4,17 +4,17 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from tests.conftest import build_test_vibe_config
-from vibe.core.agent_loop import AgentLoopStateError
-from vibe.core.nuage.exceptions import ErrorCode, WorkflowsException
-from vibe.core.nuage.remote_events_source import RemoteEventsSource
-from vibe.core.nuage.streaming import StreamEvent
+from tests.conftest import build_test_glider_config
+from glider.core.agent_loop import AgentLoopStateError
+from glider.core.nuage.exceptions import ErrorCode, WorkflowsException
+from glider.core.nuage.remote_events_source import RemoteEventsSource
+from glider.core.nuage.streaming import StreamEvent
 
 _SESSION_ID = "test-session"
 
 
 def _make_source(**kwargs) -> RemoteEventsSource:
-    config = build_test_vibe_config(enabled_tools=kwargs.pop("enabled_tools", []))
+    config = build_test_glider_config(enabled_tools=kwargs.pop("enabled_tools", []))
     return RemoteEventsSource(session_id=_SESSION_ID, config=config, **kwargs)
 
 

@@ -1,7 +1,7 @@
 [project]
-name = "mistral-vibe"
+name = "glider-code"
 version = "2.7.3"
-description = "Minimal CLI coding agent by Mistral"
+description = "Minimal CLI coding assistant by Mistral"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
@@ -65,10 +65,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/mistralai/mistral-vibe"
-Repository = "https://github.com/mistralai/mistral-vibe"
-Issues = "https://github.com/mistralai/mistral-vibe/issues"
-Documentation = "https://github.com/mistralai/mistral-vibe#readme"
+Homepage = "https://github.com/mistralai/glider-code"
+Repository = "https://github.com/mistralai/glider-code"
+Issues = "https://github.com/mistralai/glider-code/issues"
+Documentation = "https://github.com/mistralai/glider-code#readme"
 
 [build-system]
 requires = ["hatchling", "hatch-vcs", "editables"]
@@ -78,12 +78,12 @@ build-backend = "hatchling.build"
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-include = ["vibe/"]
+include = ["glider/"]
 
 
 [project.scripts]
-vibe = "vibe.cli.entrypoint:main"
-vibe-acp = "vibe.acp.entrypoint:main"
+glider = "glider.cli.entrypoint:main"
+glider-acp = "glider.acp.entrypoint:main"
 
 
 [tool.uv]
@@ -118,13 +118,13 @@ pythonVersion = "3.12"
 reportMissingTypeStubs = false
 reportPrivateImportUsage = false
 
-include = ["vibe/**/*.py", "tests/**/*.py"]
+include = ["glider/**/*.py", "tests/**/*.py"]
 exclude = ["pyinstaller/"]
 venvPath = "."
 venv = ".venv"
 
 [tool.ruff]
-include = ["vibe/**/*.py", "tests/**/*.py"]
+include = ["glider/**/*.py", "tests/**/*.py"]
 exclude = ["pyinstaller/"]
 line-length = 88
 target-version = "py312"
@@ -156,13 +156,13 @@ ignore = ["D203", "D205", "D213", "ANN401", "PLR6301"]
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN", "PLR"]
 # Textual parent classes don't use ClassVar, so we can't either without breaking pyright
-"vibe/cli/textual_ui/ansi_markdown.py" = ["RUF012"]
+"glider/cli/textual_ui/ansi_markdown.py" = ["RUF012"]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
 [tool.ruff.lint.isort]
-known-first-party = ["vibe"]
+known-first-party = ["glider"]
 force-sort-within-sections = true
 split-on-trailing-comma = false
 combine-as-imports = true

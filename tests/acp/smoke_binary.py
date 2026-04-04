@@ -97,7 +97,7 @@ async def test_acp_initialize(binary: Path) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         vibe_home = Path(tmp) / ".vibe"
         env = os.environ.copy()
-        env["VIBE_HOME"] = str(vibe_home)
+        env["GLIDER_HOME"] = str(vibe_home)
         env["MISTRAL_API_KEY"] = "smoke-test-mock-key"
 
         proc = await asyncio.create_subprocess_exec(
@@ -129,7 +129,7 @@ async def test_acp_initialize(binary: Path) -> None:
                 )
             if resp.agent_info is None:
                 _fail("agent_info is None")
-            if resp.agent_info.name != "@mistralai/mistral-vibe":
+            if resp.agent_info.name != "@mistralai/glider-code":
                 _fail(f"unexpected agent name: {resp.agent_info.name}")
 
             print(

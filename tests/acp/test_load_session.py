@@ -12,14 +12,14 @@ from acp.schema import (
 )
 import pytest
 
-from tests.conftest import build_test_vibe_config
+from tests.conftest import build_test_glider_config
 from tests.stubs.fake_backend import FakeBackend
 from tests.stubs.fake_client import FakeClient
-from vibe.acp.acp_agent_loop import VibeAcpAgentLoop
-from vibe.core.agent_loop import AgentLoop
-from vibe.core.agents.models import BuiltinAgentName
-from vibe.core.config import ModelConfig, SessionLoggingConfig
-from vibe.core.types import Role
+from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.core.agent_loop import AgentLoop
+from glider.core.agents.models import BuiltinAgentName
+from glider.core.config import ModelConfig, SessionLoggingConfig
+from glider.core.types import Role
 
 
 @pytest.fixture
@@ -29,7 +29,7 @@ def acp_agent_with_session_config(
     session_config = SessionLoggingConfig(
         save_dir=str(temp_session_dir), session_prefix="session", enabled=True
     )
-    config = build_test_vibe_config(
+    config = build_test_glider_config(
         active_model="devstral-latest",
         models=[
             ModelConfig(

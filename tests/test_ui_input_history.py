@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from vibe.cli.history_manager import HistoryManager
-from vibe.cli.textual_ui.app import VibeApp
-from vibe.cli.textual_ui.widgets.chat_input.body import ChatInputBody
-from vibe.cli.textual_ui.widgets.chat_input.container import ChatInputContainer
-from vibe.cli.textual_ui.widgets.messages import UserMessage
+from glider.cli.history_manager import HistoryManager
+from glider.cli.textual_ui.app import GliderApp
+from glider.cli.textual_ui.widgets.chat_input.body import ChatInputBody
+from glider.cli.textual_ui.widgets.chat_input.container import ChatInputContainer
+from glider.cli.textual_ui.widgets.messages import UserMessage
 
 
 @pytest.fixture
@@ -23,19 +23,19 @@ def history_file(tmp_path: Path) -> Path:
     return history_file
 
 
-def inject_history_file(vibe_app: VibeApp, history_file: Path) -> None:
+def inject_history_file(glider_app: GliderApp, history_file: Path) -> None:
     # Dependency Injection would help here, but as we don't have it yet: manual injection
-    chat_input_body = vibe_app.query_one(ChatInputBody)
+    chat_input_body = glider_app.query_one(ChatInputBody)
     chat_input_body.history = HistoryManager(history_file)
 
 
 @pytest.mark.asyncio
 async def test_ui_navigation_through_input_history(
-    vibe_app: VibeApp, history_file: Path
+    glider_app: GliderApp, history_file: Path
 ) -> None:
-    async with vibe_app.run_test() as pilot:
-        inject_history_file(vibe_app, history_file)
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test() as pilot:
+        inject_history_file(glider_app, history_file)
+        chat_input = glider_app.query_one(ChatInputContainer)
 
         await pilot.press("up")
         assert chat_input.value == "how are you?"
@@ -56,11 +56,11 @@ async def test_ui_navigation_through_input_history(
 
 @pytest.mark.asyncio
 async def test_ui_navigation_restores_partially_typed_draft_after_round_trip(
-    vibe_app: VibeApp, history_file: Path
+    glider_app: GliderApp, history_file: Path
 ) -> None:
-    async with vibe_app.run_test() as pilot:
-        inject_history_file(vibe_app, history_file)
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test() as pilot:
+        inject_history_file(glider_app, history_file)
+        chat_input = glider_app.query_one(ChatInputContainer)
 
         await pilot.press(*"he")
         assert chat_input.value == "he"
@@ -73,11 +73,11 @@ async def test_ui_navigation_restores_partially_typed_draft_after_round_trip(
 
 @pytest.mark.asyncio
 async def test_ui_does_nothing_if_command_completion_is_active(
-    vibe_app: VibeApp, history_file: Path
+    glider_app: GliderApp, history_file: Path
 ) -> None:
-    async with vibe_app.run_test() as pilot:
-        inject_history_file(vibe_app, history_file)
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test() as pilot:
+        inject_history_file(glider_app, history_file)
+        chat_input = glider_app.query_one(ChatInputContainer)
 
         await pilot.press("/")
         assert chat_input.value == "/"
@@ -89,10 +89,10 @@ async def test_ui_does_nothing_if_command_completion_is_active(
 
 @pytest.mark.asyncio
 async def test_ui_does_not_prevent_arrow_down_to_move_cursor_to_bottom_lines(
-    vibe_app: VibeApp,
+    glider_app: GliderApp,
 ):
-    async with vibe_app.run_test() as pilot:
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test() as pilot:
+        chat_input = glider_app.query_one(ChatInputContainer)
         textarea = chat_input.input_widget
         assert textarea is not None
 
@@ -114,9 +114,9 @@ async def test_ui_does_not_prevent_arrow_down_to_move_cursor_to_bottom_lines(
 
 
 @pytest.mark.asyncio
-async def test_ui_alt_left_and_alt_right_move_by_word(vibe_app: VibeApp) -> None:
-    async with vibe_app.run_test() as pilot:
-        chat_input = vibe_app.query_one(ChatInputContainer)
+async def test_ui_alt_left_and_alt_right_move_by_word(glider_app: GliderApp) -> None:
+    async with glider_app.run_test() as pilot:
+        chat_input = glider_app.query_one(ChatInputContainer)
         textarea = chat_input.input_widget
         assert textarea is not None
 
@@ -133,21 +133,21 @@ async def test_ui_alt_left_and_alt_right_move_by_word(vibe_app: VibeApp) -> None
         assert textarea.cursor_location == (0, len("hello brave"))
 
         assert chat_input.value == "hello brave world"
-        assert len(vibe_app.query(UserMessage)) == 0
+        assert len(glider_app.query(UserMessage)) == 0
 
 
 @pytest.mark.asyncio
 async def test_ui_resumes_arrow_down_after_manual_move(
-    vibe_app: VibeApp, tmp_path: Path
+    glider_app: GliderApp, tmp_path: Path
 ) -> None:
     history_path = tmp_path / "history.jsonl"
     history_path.write_text(
         json.dumps("first line\nsecond line") + "\n", encoding="utf-8"
     )
 
-    async with vibe_app.run_test() as pilot:
-        inject_history_file(vibe_app, history_path)
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test() as pilot:
+        inject_history_file(glider_app, history_path)
+        chat_input = glider_app.query_one(ChatInputContainer)
         textarea = chat_input.input_widget
         assert textarea is not None
 
@@ -162,12 +162,12 @@ async def test_ui_resumes_arrow_down_after_manual_move(
 
 @pytest.mark.asyncio
 async def test_ui_does_not_intercept_arrow_down_inside_wrapped_single_line_input(
-    vibe_app: VibeApp,
+    glider_app: GliderApp,
 ) -> None:
     long_input = "0123456789 " * 20
 
-    async with vibe_app.run_test(size=(40, 20)) as pilot:
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test(size=(40, 20)) as pilot:
+        chat_input = glider_app.query_one(ChatInputContainer)
         textarea = chat_input.input_widget
         assert textarea is not None
 
@@ -187,13 +187,13 @@ async def test_ui_does_not_intercept_arrow_down_inside_wrapped_single_line_input
 
 @pytest.mark.asyncio
 async def test_ui_intercepts_arrow_up_only_on_first_wrapped_row(
-    vibe_app: VibeApp, history_file: Path
+    glider_app: GliderApp, history_file: Path
 ) -> None:
     long_input = "abcdefghij " * 20
 
-    async with vibe_app.run_test(size=(40, 20)) as pilot:
-        inject_history_file(vibe_app, history_file)
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test(size=(40, 20)) as pilot:
+        inject_history_file(glider_app, history_file)
+        chat_input = glider_app.query_one(ChatInputContainer)
         textarea = chat_input.input_widget
         assert textarea is not None
 
@@ -213,13 +213,13 @@ async def test_ui_intercepts_arrow_up_only_on_first_wrapped_row(
 
 @pytest.mark.asyncio
 async def test_ui_up_from_wrapped_top_loads_history_after_down_at_wrapped_bottom(
-    vibe_app: VibeApp, history_file: Path
+    glider_app: GliderApp, history_file: Path
 ) -> None:
     long_input = "LONG " + ("x" * 160)
 
-    async with vibe_app.run_test(size=(40, 20)) as pilot:
-        inject_history_file(vibe_app, history_file)
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test(size=(40, 20)) as pilot:
+        inject_history_file(glider_app, history_file)
+        chat_input = glider_app.query_one(ChatInputContainer)
         textarea = chat_input.input_widget
         assert textarea is not None
 
@@ -239,16 +239,16 @@ async def test_ui_up_from_wrapped_top_loads_history_after_down_at_wrapped_bottom
 
 @pytest.mark.asyncio
 async def test_ui_down_cycles_to_next_history_without_manual_move_after_loading_multiline_entry(
-    vibe_app: VibeApp, tmp_path: Path
+    glider_app: GliderApp, tmp_path: Path
 ) -> None:
     long_first_line = "abcdefghij " * 20
     history_entry = f"{long_first_line}\nsecond line"
     history_path = tmp_path / "history.jsonl"
     history_path.write_text(json.dumps(history_entry) + "\n", encoding="utf-8")
 
-    async with vibe_app.run_test(size=(40, 20)) as pilot:
-        inject_history_file(vibe_app, history_path)
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test(size=(40, 20)) as pilot:
+        inject_history_file(glider_app, history_path)
+        chat_input = glider_app.query_one(ChatInputContainer)
         textarea = chat_input.input_widget
         assert textarea is not None
 
@@ -263,7 +263,7 @@ async def test_ui_down_cycles_to_next_history_without_manual_move_after_loading_
 
 @pytest.mark.asyncio
 async def test_ui_up_continues_history_cycle_after_loading_wrapped_multiline_entry(
-    vibe_app: VibeApp, tmp_path: Path
+    glider_app: GliderApp, tmp_path: Path
 ) -> None:
     long_first_line = "abcdefghij " * 20
     wrapped_multiline = f"{long_first_line}\nsecond line"
@@ -274,9 +274,9 @@ async def test_ui_up_continues_history_cycle_after_loading_wrapped_multiline_ent
         encoding="utf-8",
     )
 
-    async with vibe_app.run_test(size=(40, 20)) as pilot:
-        inject_history_file(vibe_app, history_path)
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test(size=(40, 20)) as pilot:
+        inject_history_file(glider_app, history_path)
+        chat_input = glider_app.query_one(ChatInputContainer)
         textarea = chat_input.input_widget
         assert textarea is not None
 
@@ -293,7 +293,7 @@ async def test_ui_up_continues_history_cycle_after_loading_wrapped_multiline_ent
 
 @pytest.mark.asyncio
 async def test_ui_down_at_visual_end_resumes_history_after_manual_cursor_move(
-    vibe_app: VibeApp, tmp_path: Path
+    glider_app: GliderApp, tmp_path: Path
 ) -> None:
     long_first_line = "abcdefghij " * 20
     wrapped_multiline = f"{long_first_line}\nsecond line"
@@ -304,9 +304,9 @@ async def test_ui_down_at_visual_end_resumes_history_after_manual_cursor_move(
         encoding="utf-8",
     )
 
-    async with vibe_app.run_test(size=(40, 20)) as pilot:
-        inject_history_file(vibe_app, history_path)
-        chat_input = vibe_app.query_one(ChatInputContainer)
+    async with glider_app.run_test(size=(40, 20)) as pilot:
+        inject_history_file(glider_app, history_path)
+        chat_input = glider_app.query_one(ChatInputContainer)
         textarea = chat_input.input_widget
         assert textarea is not None
 

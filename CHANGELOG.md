@@ -89,12 +89,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill tool for managing task lists and workflows
 - Text-to-speech (TTS) functionality
 - Standalone --resume command for session picker
-- BFS for vibe folders to improve startup performance
+- BFS for glider folders to improve startup performance
 - List-based model picker for /model command
 - is_user_prompt flag to Mistral metadata header
 - Correlation ID in user feedback calls
-- Current date added to system prompt in vibe-work
-- TypeScript type inference for large tool outputs in vibe-work-harness
+- Current date added to system prompt in glider-work
+- TypeScript type inference for large tool outputs in glider-work-harness
 
 ### Changed
 
@@ -102,7 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed inline code color from yellow to green
 - Removed "You have no internet access" from CLI prompt
 - Fine-grained permission system improvements
-- Inject system certs into vibe-acp frozen binary via truststore
+- Inject system certs into glider-acp frozen binary via truststore
 
 ### Fixed
 
@@ -124,7 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dedicated theorem proving agent powered by leanstral, setup with /leanstall
 - More advanced AGENTS.md support:
-  - AGENTS.md in ~/.vibe/ folder for user-level agent instructions
+  - AGENTS.md in ~/.glider/ folder for user-level agent instructions
   - AGENTS.md for subfolders and in parent folders
 - Mistral Code API key info displayed in CLI banner
 - Voice mode with real-time transcription support
@@ -156,7 +156,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skills now extract arguments when invoked, improving parameter handling
 - Auto-compact threshold falls back to global setting when not defined at model level
 - Update notification toast no longer times out, ensuring the user sees the restart prompt
-- Removed `file_content_before` from Vibe Code, reducing payload size
+- Removed `file_content_before` from Glider Code, reducing payload size
 
 
 ## [2.4.1] - 2026-03-10
@@ -241,7 +241,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Multiple clipboard copy strategies: OSC52 first, then pyperclip fallback when system clipboard is available (e.g. local GUI, SSH without OSC52)
-- Ctrl+Z to put Vibe in background
+- Ctrl+Z to put Glider in background
 
 ### Changed
 
@@ -265,7 +265,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Google Vertex AI support
 - Telemetry: user interaction and tool usage events sent to datalake (configurable via `enable_telemetry`)
-- Skill discovery from `.agents/skills/` (Agent Skills standard) in addition to `.vibe/skills/`
+- Skill discovery from `.agents/skills/` (Agent Skills standard) in addition to `.glider/skills/`
 - ACP: `session/load` and `session/list` for loading and listing sessions
 - New model behavior prompts (CLI and explore)
 - Proxy Wizard (PoC) for CLI and for ACP
@@ -371,7 +371,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use shell environment to determine shell in bash tool
 - Expanded user input handling
 - Bumped agent-client-protocol to 0.7.1
-- Refactored UI to require AgentLoop at VibeApp construction
+- Refactored UI to require AgentLoop at GliderApp construction
 - Updated README with new MCP server config
 - Improved readability of the AskUserQuerstion tool output
 
@@ -396,7 +396,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- bash tool not discovered by vibe-acp
+- bash tool not discovered by glider-acp
 
 ## [1.3.4] - 2026-01-07
 
@@ -472,8 +472,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Modular mode system
-- Trusted folder mechanism for local .vibe directories
-- Document public setup for vibe-acp in zed, jetbrains and neovim
+- Trusted folder mechanism for local .glider directories
+- Document public setup for glider-acp in zed, jetbrains and neovim
 - `--version` flag
 
 ### Changed
@@ -559,7 +559,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Rename agent in distribution/zed/extension.toml to mistral-vibe
+- Rename agent in distribution/zed/extension.toml to mistral-glider
 
 ### Fixed
 
@@ -579,7 +579,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix setup flow for vibe-acp builds
+- Fix setup flow for glider-acp builds
 
 ## [1.0.1] - 2025-12-09
 

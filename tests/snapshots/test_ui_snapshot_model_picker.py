@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 from textual.pilot import Pilot
 
-from tests.conftest import build_test_vibe_config
+from tests.conftest import build_test_glider_config
 from tests.snapshots.base_snapshot_test_app import BaseSnapshotTestApp
 from tests.snapshots.snap_compare import SnapCompare
-from vibe.core.config._settings import ModelConfig
+from glider.core.config._settings import ModelConfig
 
 
 def _model_picker_config():
@@ -22,7 +22,7 @@ def _model_picker_config():
         ),
         ModelConfig(name="devstral", provider="llamacpp", alias="local"),
     ]
-    return build_test_vibe_config(
+    return build_test_glider_config(
         models=models,
         active_model="devstral",
         disable_welcome_banner_animation=True,
@@ -74,7 +74,7 @@ def test_snapshot_model_picker_select_different_model(
         await pilot.press("enter")
         await pilot.pause(0.2)
 
-    with patch("vibe.cli.textual_ui.app.VibeConfig.save_updates"):
+    with patch("vibe.cli.textual_ui.app.GliderConfig.save_updates"):
         assert snap_compare(
             "test_ui_snapshot_model_picker.py:ModelPickerTestApp",
             terminal_size=(100, 36),

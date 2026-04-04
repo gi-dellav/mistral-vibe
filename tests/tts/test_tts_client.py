@@ -5,8 +5,8 @@ import base64
 import httpx
 import pytest
 
-from vibe.core.config import TTSModelConfig, TTSProviderConfig
-from vibe.core.tts import MistralTTSClient, TTSResult
+from glider.core.config import TTSModelConfig, TTSProviderConfig
+from glider.core.tts import MistralTTSClient, TTSResult
 
 
 def _make_provider() -> TTSProviderConfig:

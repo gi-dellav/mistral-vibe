@@ -8,12 +8,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from tests.conftest import build_test_vibe_config
-from vibe.core.agents.models import AgentProfile, AgentSafety
-from vibe.core.config import SessionLoggingConfig, VibeConfig
-from vibe.core.session.session_logger import SessionLogger
-from vibe.core.tools.manager import ToolManager
-from vibe.core.types import AgentStats, LLMMessage, Role, SessionMetadata
+from tests.conftest import build_test_glider_config
+from glider.core.agents.models import AgentProfile, AgentSafety
+from glider.core.config import SessionLoggingConfig, GliderConfig
+from glider.core.session.session_logger import SessionLogger
+from glider.core.tools.manager import ToolManager
+from glider.core.types import AgentStats, LLMMessage, Role, SessionMetadata
 
 
 @pytest.fixture
@@ -61,9 +61,9 @@ def mock_tool_manager() -> ToolManager:
 
 
 @pytest.fixture
-def mock_vibe_config() -> VibeConfig:
+def mock_glider_config() -> GliderConfig:
     """Create a mock vibe config for testing."""
-    return build_test_vibe_config(active_model="test-model", models=[], providers=[])
+    return build_test_glider_config(active_model="test-model", models=[], providers=[])
 
 
 class TestSessionLoggerInitialization:
@@ -172,7 +172,7 @@ class TestSessionLoggerSaveInteraction:
         result = await logger.save_interaction(
             messages=[],
             stats=AgentStats(),
-            base_config=build_test_vibe_config(
+            base_config=build_test_glider_config(
                 active_model="test", models=[], providers=[]
             ),
             tool_manager=MagicMock(),
@@ -191,7 +191,7 @@ class TestSessionLoggerSaveInteraction:
     async def test_save_interaction_success(
         self,
         session_config: SessionLoggingConfig,
-        mock_vibe_config: VibeConfig,
+        mock_glider_config: GliderConfig,
         mock_tool_manager: ToolManager,
         mock_agent_profile: AgentProfile,
     ) -> None:
@@ -214,7 +214,7 @@ class TestSessionLoggerSaveInteraction:
         await logger.save_interaction(
             messages=messages,
             stats=stats,
-            base_config=mock_vibe_config,
+            base_config=mock_glider_config,
             tool_manager=mock_tool_manager,
             agent_profile=mock_agent_profile,
         )
@@ -240,7 +240,7 @@ class TestSessionLoggerSaveInteraction:
     async def test_save_interaction_system_prompt_in_metadata(
         self,
         session_config: SessionLoggingConfig,
-        mock_vibe_config: VibeConfig,
+        mock_glider_config: GliderConfig,
         mock_tool_manager: ToolManager,
         mock_agent_profile: AgentProfile,
     ) -> None:
@@ -261,7 +261,7 @@ class TestSessionLoggerSaveInteraction:
         await logger.save_interaction(
             messages=messages,
             stats=stats,
-            base_config=mock_vibe_config,
+            base_config=mock_glider_config,
             tool_manager=mock_tool_manager,
             agent_profile=mock_agent_profile,
         )
@@ -289,7 +289,7 @@ class TestSessionLoggerSaveInteraction:
     async def test_save_interaction_with_existing_messages(
         self,
         session_config: SessionLoggingConfig,
-        mock_vibe_config: VibeConfig,
+        mock_glider_config: GliderConfig,
         mock_tool_manager: ToolManager,
         mock_agent_profile: AgentProfile,
     ) -> None:
@@ -311,7 +311,7 @@ class TestSessionLoggerSaveInteraction:
         await logger.save_interaction(
             messages=initial_messages,
             stats=stats,
-            base_config=mock_vibe_config,
+            base_config=mock_glider_config,
             tool_manager=mock_tool_manager,
             agent_profile=mock_agent_profile,
         )
@@ -330,7 +330,7 @@ class TestSessionLoggerSaveInteraction:
         await logger.save_interaction(
             messages=all_messages,
             stats=updated_stats,
-            base_config=mock_vibe_config,
+            base_config=mock_glider_config,
             tool_manager=mock_tool_manager,
             agent_profile=mock_agent_profile,
         )
@@ -354,7 +354,7 @@ class TestSessionLoggerSaveInteraction:
     async def test_save_interaction_no_new_messages_is_noop(
         self,
         session_config: SessionLoggingConfig,
-        mock_vibe_config: VibeConfig,
+        mock_glider_config: GliderConfig,
         mock_tool_manager: ToolManager,
         mock_agent_profile: AgentProfile,
     ) -> None:
@@ -374,7 +374,7 @@ class TestSessionLoggerSaveInteraction:
         await logger.save_interaction(
             messages=messages,
             stats=stats,
-            base_config=mock_vibe_config,
+            base_config=mock_glider_config,
             tool_manager=mock_tool_manager,
             agent_profile=mock_agent_profile,
         )
@@ -392,7 +392,7 @@ class TestSessionLoggerSaveInteraction:
         await logger.save_interaction(
             messages=messages,
             stats=stats,
-            base_config=mock_vibe_config,
+            base_config=mock_glider_config,
             tool_manager=mock_tool_manager,
             agent_profile=mock_agent_profile,
         )
@@ -411,7 +411,7 @@ class TestSessionLoggerSaveInteraction:
     async def test_save_interaction_no_user_messages(
         self,
         session_config: SessionLoggingConfig,
-        mock_vibe_config: VibeConfig,
+        mock_glider_config: GliderConfig,
         mock_tool_manager: ToolManager,
         mock_agent_profile: AgentProfile,
     ) -> None:
@@ -432,7 +432,7 @@ class TestSessionLoggerSaveInteraction:
         await logger.save_interaction(
             messages=messages,
             stats=stats,
-            base_config=mock_vibe_config,
+            base_config=mock_glider_config,
             tool_manager=mock_tool_manager,
             agent_profile=mock_agent_profile,
         )
@@ -457,7 +457,7 @@ class TestSessionLoggerSaveInteraction:
     async def test_save_interaction_long_user_message(
         self,
         session_config: SessionLoggingConfig,
-        mock_vibe_config: VibeConfig,
+        mock_glider_config: GliderConfig,
         mock_tool_manager: ToolManager,
         mock_agent_profile: AgentProfile,
     ) -> None:
@@ -480,7 +480,7 @@ class TestSessionLoggerSaveInteraction:
         await logger.save_interaction(
             messages=messages,
             stats=stats,
-            base_config=mock_vibe_config,
+            base_config=mock_glider_config,
             tool_manager=mock_tool_manager,
             agent_profile=mock_agent_profile,
         )
@@ -506,7 +506,7 @@ class TestSessionLoggerSaveInteraction:
     async def test_save_interaction_throttles_tmp_cleanup(
         self,
         session_config: SessionLoggingConfig,
-        mock_vibe_config: VibeConfig,
+        mock_glider_config: GliderConfig,
         mock_tool_manager: ToolManager,
         mock_agent_profile: AgentProfile,
     ) -> None:
@@ -541,14 +541,14 @@ class TestSessionLoggerSaveInteraction:
             await logger.save_interaction(
                 messages=messages,
                 stats=AgentStats(steps=1),
-                base_config=mock_vibe_config,
+                base_config=mock_glider_config,
                 tool_manager=mock_tool_manager,
                 agent_profile=mock_agent_profile,
             )
             await logger.save_interaction(
                 messages=messages,
                 stats=AgentStats(steps=2),
-                base_config=mock_vibe_config,
+                base_config=mock_glider_config,
                 tool_manager=mock_tool_manager,
                 agent_profile=mock_agent_profile,
             )

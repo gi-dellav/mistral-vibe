@@ -12,22 +12,22 @@ import pytest
 
 from tests.conftest import (
     build_test_agent_loop,
-    build_test_vibe_config,
+    build_test_glider_config,
     make_test_models,
 )
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
-from vibe.core.agents.models import BuiltinAgentName
-from vibe.core.config import ModelConfig, ProviderConfig, VibeConfig
-from vibe.core.tools.base import BaseToolConfig, ToolPermission
-from vibe.core.types import Backend, EntrypointMetadata, FunctionCall, ToolCall
+from glider.core.agents.models import BuiltinAgentName
+from glider.core.config import ModelConfig, ProviderConfig, GliderConfig
+from glider.core.tools.base import BaseToolConfig, ToolPermission
+from glider.core.types import Backend, EntrypointMetadata, FunctionCall, ToolCall
 
 
-def _two_model_vibe_config(active_model: str) -> VibeConfig:
-    """VibeConfig with two models so we can switch active_model."""
+def _two_model_glider_config(active_model: str) -> GliderConfig:
+    """GliderConfig with two models so we can switch active_model."""
     models = [
         ModelConfig(
-            name="mistral-vibe-cli-latest", provider="mistral", alias="devstral-latest"
+            name="glider-code-cli-latest", provider="mistral", alias="devstral-latest"
         ),
         ModelConfig(
             name="devstral-small-latest", provider="mistral", alias="devstral-small"
@@ -41,7 +41,7 @@ def _two_model_vibe_config(active_model: str) -> VibeConfig:
             backend=Backend.MISTRAL,
         )
     ]
-    return build_test_vibe_config(
+    return build_test_glider_config(
         active_model=active_model, models=models, providers=providers
     )
 
@@ -58,9 +58,9 @@ def _make_sampling_params() -> CreateMessageRequestParams:
 
 
 @pytest.mark.asyncio
-async def test_passes_x_affinity_header_when_asking_an_answer(vibe_config: VibeConfig):
+async def test_passes_x_affinity_header_when_asking_an_answer(glider_config: GliderConfig):
     backend = FakeBackend([mock_llm_chunk(content="Response")])
-    agent = build_test_agent_loop(config=vibe_config, backend=backend)
+    agent = build_test_agent_loop(config=glider_config, backend=backend)
 
     [_ async for _ in agent.act("Hello")]
 
@@ -73,11 +73,11 @@ async def test_passes_x_affinity_header_when_asking_an_answer(vibe_config: VibeC
 
 @pytest.mark.asyncio
 async def test_passes_x_affinity_header_when_asking_an_answer_streaming(
-    vibe_config: VibeConfig,
+    glider_config: GliderConfig,
 ):
     backend = FakeBackend([mock_llm_chunk(content="Response")])
     agent = build_test_agent_loop(
-        config=vibe_config, backend=backend, enable_streaming=True
+        config=glider_config, backend=backend, enable_streaming=True
     )
 
     [_ async for _ in agent.act("Hello")]
@@ -90,10 +90,10 @@ async def test_passes_x_affinity_header_when_asking_an_answer_streaming(
 
 
 @pytest.mark.asyncio
-async def test_updates_tokens_stats_based_on_backend_response(vibe_config: VibeConfig):
+async def test_updates_tokens_stats_based_on_backend_response(glider_config: GliderConfig):
     chunk = mock_llm_chunk(content="Response", prompt_tokens=100, completion_tokens=50)
     backend = FakeBackend([chunk])
-    agent = build_test_agent_loop(config=vibe_config, backend=backend)
+    agent = build_test_agent_loop(config=glider_config, backend=backend)
 
     [_ async for _ in agent.act("Hello")]
 
@@ -102,14 +102,14 @@ async def test_updates_tokens_stats_based_on_backend_response(vibe_config: VibeC
 
 @pytest.mark.asyncio
 async def test_updates_tokens_stats_based_on_backend_response_streaming(
-    vibe_config: VibeConfig,
+    glider_config: GliderConfig,
 ):
     final_chunk = mock_llm_chunk(
         content="Complete", prompt_tokens=200, completion_tokens=75
     )
     backend = FakeBackend([final_chunk])
     agent = build_test_agent_loop(
-        config=vibe_config, backend=backend, enable_streaming=True
+        config=glider_config, backend=backend, enable_streaming=True
     )
 
     [_ async for _ in agent.act("Hello")]
@@ -118,9 +118,9 @@ async def test_updates_tokens_stats_based_on_backend_response_streaming(
 
 
 @pytest.mark.asyncio
-async def test_passes_session_id_to_backend(vibe_config: VibeConfig):
+async def test_passes_session_id_to_backend(glider_config: GliderConfig):
     backend = FakeBackend([mock_llm_chunk(content="Response")])
-    agent = build_test_agent_loop(config=vibe_config, backend=backend)
+    agent = build_test_agent_loop(config=glider_config, backend=backend)
 
     [_ async for _ in agent.act("Hello")]
 
@@ -134,7 +134,7 @@ async def test_passes_session_id_to_backend(vibe_config: VibeConfig):
 
 
 @pytest.mark.asyncio
-async def test_passes_entrypoint_metadata_to_backend(vibe_config: VibeConfig):
+async def test_passes_entrypoint_metadata_to_backend(glider_config: GliderConfig):
     metadata = EntrypointMetadata(
         agent_entrypoint="acp",
         agent_version="2.0.0",
@@ -143,7 +143,7 @@ async def test_passes_entrypoint_metadata_to_backend(vibe_config: VibeConfig):
     )
     backend = FakeBackend([mock_llm_chunk(content="Response")])
     agent = build_test_agent_loop(
-        config=vibe_config,
+        config=glider_config,
         backend=backend,
         enable_streaming=True,
         entrypoint_metadata=metadata,
@@ -169,7 +169,7 @@ async def test_mcp_sampling_handler_uses_updated_backend_when_agent_backend_chan
     """AgentLoop's MCP sampling handler uses current backend when backend is reassigned."""
     backend1 = FakeBackend([mock_llm_chunk(content="from-backend-1")])
     backend2 = FakeBackend([mock_llm_chunk(content="from-backend-2")])
-    config = _two_model_vibe_config("devstral-latest")
+    config = _two_model_glider_config("devstral-latest")
     agent = build_test_agent_loop(config=config, backend=backend1)
     handler = agent._sampling_handler
     params = _make_sampling_params()
@@ -195,8 +195,8 @@ async def test_mcp_sampling_handler_uses_updated_backend_when_agent_backend_chan
 async def test_mcp_sampling_handler_uses_updated_config_when_agent_config_changes():
     chunk = mock_llm_chunk(content="ok")
     backend = FakeBackend([chunk])
-    config1 = _two_model_vibe_config("devstral-latest")
-    config2 = _two_model_vibe_config("devstral-small")
+    config1 = _two_model_glider_config("devstral-latest")
+    config2 = _two_model_glider_config("devstral-small")
     agent = build_test_agent_loop(config=config1, backend=backend)
     handler = agent._sampling_handler
     params = _make_sampling_params()
@@ -204,7 +204,7 @@ async def test_mcp_sampling_handler_uses_updated_config_when_agent_config_change
 
     result1 = await handler(context, params)
     assert isinstance(result1, CreateMessageResult)
-    assert result1.model == "mistral-vibe-cli-latest"
+    assert result1.model == "glider-code-cli-latest"
 
     agent._base_config = config2
     agent.agent_manager.invalidate_config()
@@ -213,8 +213,8 @@ async def test_mcp_sampling_handler_uses_updated_config_when_agent_config_change
     assert result2.model == "devstral-small-latest"
 
 
-def _generic_provider_vibe_config() -> VibeConfig:
-    """VibeConfig with generic backend so no metadata header is sent."""
+def _generic_provider_glider_config() -> GliderConfig:
+    """GliderConfig with generic backend so no metadata header is sent."""
     providers = [
         ProviderConfig(
             name="mistral",
@@ -223,7 +223,7 @@ def _generic_provider_vibe_config() -> VibeConfig:
             backend=Backend.GENERIC,
         )
     ]
-    return build_test_vibe_config(providers=providers)
+    return build_test_glider_config(providers=providers)
 
 
 @pytest.mark.asyncio
@@ -238,7 +238,7 @@ async def test_mistral_metadata_header_is_user_prompt_per_turn() -> None:
         [mock_llm_chunk(content="Checking todos.", tool_calls=[tool_call])],
         [mock_llm_chunk(content="Here are your todos.")],
     ])
-    config = build_test_vibe_config(
+    config = build_test_glider_config(
         providers=[
             ProviderConfig(
                 name="mistral",
@@ -276,7 +276,7 @@ async def test_auto_compact_internal_chat_has_is_user_prompt_false_then_user_tur
         [mock_llm_chunk(content="<summary>")],
         [mock_llm_chunk(content="<final>")],
     ])
-    config = build_test_vibe_config(
+    config = build_test_glider_config(
         models=make_test_models(auto_compact_threshold=1),
         providers=[
             ProviderConfig(
@@ -307,7 +307,7 @@ async def test_auto_compact_internal_chat_has_is_user_prompt_false_then_user_tur
 async def test_generic_provider_has_no_metadata_header() -> None:
     """Non-Mistral provider does not send the metadata header."""
     backend = FakeBackend([mock_llm_chunk(content="Response")])
-    config = _generic_provider_vibe_config()
+    config = _generic_provider_glider_config()
     agent = build_test_agent_loop(config=config, backend=backend)
 
     [_ async for _ in agent.act("Hello")]

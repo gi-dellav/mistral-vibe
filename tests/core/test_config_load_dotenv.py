@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 import threading
 
-from vibe.core.config import load_dotenv_values
+from glider.core.config import load_dotenv_values
 
 
 def _write_env_file(path: Path, content: str) -> None:

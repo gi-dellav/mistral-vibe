@@ -4,13 +4,13 @@ import pytest
 
 from tests.conftest import (
     build_test_agent_loop,
-    build_test_vibe_config,
+    build_test_glider_config,
     make_test_models,
 )
 from tests.mock.utils import mock_llm_chunk
 from tests.stubs.fake_backend import FakeBackend
-from vibe.core.config import ModelConfig
-from vibe.core.types import (
+from glider.core.config import ModelConfig
+from glider.core.types import (
     AssistantEvent,
     CompactEndEvent,
     CompactStartEvent,
@@ -26,7 +26,7 @@ async def test_auto_compact_emits_correct_events(telemetry_events: list[dict]) -
         [mock_llm_chunk(content="<summary>")],
         [mock_llm_chunk(content="<final>")],
     ])
-    cfg = build_test_vibe_config(models=make_test_models(auto_compact_threshold=1))
+    cfg = build_test_glider_config(models=make_test_models(auto_compact_threshold=1))
     agent = build_test_agent_loop(config=cfg, backend=backend)
     agent.stats.context_tokens = 2
 
@@ -49,7 +49,7 @@ async def test_auto_compact_emits_correct_events(telemetry_events: list[dict]) -
     auto_compact = [
         e
         for e in telemetry_events
-        if e.get("event_name") == "vibe.auto_compact_triggered"
+        if e.get("event_name") == "glider.auto_compact_triggered"
     ]
     assert len(auto_compact) == 1
 
@@ -70,7 +70,7 @@ async def test_auto_compact_observer_sees_user_msg_not_summary() -> None:
         [mock_llm_chunk(content="<summary>")],
         [mock_llm_chunk(content="<final>")],
     ])
-    cfg = build_test_vibe_config(models=make_test_models(auto_compact_threshold=1))
+    cfg = build_test_glider_config(models=make_test_models(auto_compact_threshold=1))
     agent = build_test_agent_loop(
         config=cfg, message_observer=observer, backend=backend
     )
@@ -96,7 +96,7 @@ async def test_auto_compact_observer_does_not_see_summary_request() -> None:
         [mock_llm_chunk(content="<summary>")],
         [mock_llm_chunk(content="<final>")],
     ])
-    cfg = build_test_vibe_config(models=make_test_models(auto_compact_threshold=1))
+    cfg = build_test_glider_config(models=make_test_models(auto_compact_threshold=1))
     agent = build_test_agent_loop(
         config=cfg, message_observer=observer, backend=backend
     )
@@ -116,7 +116,7 @@ async def test_compact_replaces_messages_with_summary() -> None:
         [mock_llm_chunk(content="<summary>")],
         [mock_llm_chunk(content="<final>")],
     ])
-    cfg = build_test_vibe_config(models=make_test_models(auto_compact_threshold=1))
+    cfg = build_test_glider_config(models=make_test_models(auto_compact_threshold=1))
     agent = build_test_agent_loop(config=cfg, backend=backend)
     agent.stats.context_tokens = 2
 
@@ -151,7 +151,7 @@ async def test_compact_uses_compaction_model() -> None:
         [mock_llm_chunk(content="<summary>")],
         [mock_llm_chunk(content="<final>")],
     ])
-    cfg = build_test_vibe_config(
+    cfg = build_test_glider_config(
         models=make_test_models(auto_compact_threshold=1), compaction_model=compaction
     )
     agent = build_test_agent_loop(config=cfg, backend=backend)
@@ -170,7 +170,7 @@ async def test_compact_uses_active_model_when_no_compaction_model() -> None:
         [mock_llm_chunk(content="<summary>")],
         [mock_llm_chunk(content="<final>")],
     ])
-    cfg = build_test_vibe_config(models=make_test_models(auto_compact_threshold=1))
+    cfg = build_test_glider_config(models=make_test_models(auto_compact_threshold=1))
     agent = build_test_agent_loop(config=cfg, backend=backend)
     agent.stats.context_tokens = 2
 

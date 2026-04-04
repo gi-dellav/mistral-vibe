@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import pytest
 
-from vibe.core.rewind.manager import FileSnapshot, RewindError, RewindManager
-from vibe.core.types import LLMMessage, MessageList, Role
+from glider.core.rewind.manager import FileSnapshot, RewindError, RewindManager
+from glider.core.types import LLMMessage, MessageList, Role
 
 
 def _make_messages(*contents: str) -> MessageList:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from vibe.cli.textual_ui.widgets.messages import StreamingMessageBase
+from glider.cli.textual_ui.widgets.messages import StreamingMessageBase
 
 
 class FakeStream:
