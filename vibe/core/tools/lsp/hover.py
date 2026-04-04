@@ -42,7 +42,8 @@ class Hover(BaseLSPTool[HoverArgs, HoverResult]):
                 args.file_path, args.line, args.character
             )
 
-            response = await server_process.request("textDocument/hover", params)
+            async with server_process.start_server():
+                response = await server_process.request("textDocument/hover", params)
 
             if not response:
                 yield HoverResult(

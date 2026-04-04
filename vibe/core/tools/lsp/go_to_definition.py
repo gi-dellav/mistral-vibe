@@ -46,7 +46,8 @@ class GoToDefinition(BaseLSPTool[GoToDefinitionArgs, GoToDefinitionResult]):
                 args.file_path, args.line, args.character
             )
 
-            response = await server_process.request("textDocument/definition", params)
+            async with server_process.start_server():
+                response = await server_process.request("textDocument/definition", params)
 
             if not response:
                 raise ToolError(

@@ -63,7 +63,8 @@ class FindReferences(BaseLSPTool[FindReferencesArgs, FindReferencesResult]):
                 "context": {"includeDeclaration": args.include_declaration},
             }
 
-            response = await server_process.request("textDocument/references", params)
+            async with server_process.start_server():
+                response = await server_process.request("textDocument/references", params)
 
             if not response or not isinstance(response, list):
                 raise ToolError(

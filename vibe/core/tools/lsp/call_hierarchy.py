@@ -64,9 +64,10 @@ class CallHierarchy(BaseLSPTool[CallHierarchyArgs, CallHierarchyResult]):
                 args.file_path, args.line, args.character
             )
 
-            prepare_response = await server_process.request(
-                "textDocument/prepareCallHierarchy", prepare_params
-            )
+            async with server_process.start_server():
+                prepare_response = await server_process.request(
+                    "textDocument/prepareCallHierarchy", prepare_params
+                )
 
             if not prepare_response:
                 yield CallHierarchyResult(
@@ -135,9 +136,10 @@ class CallHierarchy(BaseLSPTool[CallHierarchyArgs, CallHierarchyResult]):
         """Get incoming calls (functions that call this function)."""
         try:
             params = {"item": item}
-            response = await server_process.request(
-                "callHierarchy/incomingCalls", params
-            )
+            async with server_process.start_server():
+                response = await server_process.request(
+                    "callHierarchy/incomingCalls", params
+                )
 
             return await self._parse_call_locations(response, context_lines, "incoming")
         except Exception:
@@ -149,9 +151,10 @@ class CallHierarchy(BaseLSPTool[CallHierarchyArgs, CallHierarchyResult]):
         """Get outgoing calls (functions called by this function)."""
         try:
             params = {"item": item}
-            response = await server_process.request(
-                "callHierarchy/outgoingCalls", params
-            )
+            async with server_process.start_server():
+                response = await server_process.request(
+                    "callHierarchy/outgoingCalls", params
+                )
 
             return await self._parse_call_locations(response, context_lines, "outgoing")
         except Exception:

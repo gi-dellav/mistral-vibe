@@ -63,13 +63,14 @@ class TypeHierarchy(BaseLSPTool[TypeHierarchyArgs, TypeHierarchyResult]):
         try:
             server_process = await self._ensure_server_running(args.file_path)
 
-            prepare_params = self._create_position_params(
+            params = self._create_position_params(
                 args.file_path, args.line, args.character
             )
 
-            prepare_response = await server_process.request(
-                "typeHierarchy/prepare", prepare_params
-            )
+            async with server_process.start_server():
+                prepare_response = await server_process.request(
+                    "typeHierarchy/prepare", params
+                )
 
             if not prepare_response:
                 yield TypeHierarchyResult(
@@ -138,7 +139,8 @@ class TypeHierarchy(BaseLSPTool[TypeHierarchyArgs, TypeHierarchyResult]):
         """Get supertypes (parent types) for a type hierarchy item."""
         try:
             params = {"item": item}
-            response = await server_process.request("typeHierarchy/supertypes", params)
+            async with server_process.start_server():
+                response = await server_process.request("typeHierarchy/supertypes", params)
 
             return await self._parse_hierarchy_items(response, context_lines)
         except Exception:
@@ -150,7 +152,8 @@ class TypeHierarchy(BaseLSPTool[TypeHierarchyArgs, TypeHierarchyResult]):
         """Get subtypes (child types) for a type hierarchy item."""
         try:
             params = {"item": item}
-            response = await server_process.request("typeHierarchy/subtypes", params)
+            async with server_process.start_server():
+                response = await server_process.request("typeHierarchy/subtypes", params)
 
             return await self._parse_hierarchy_items(response, context_lines)
         except Exception:
