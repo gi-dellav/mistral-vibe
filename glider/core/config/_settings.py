@@ -319,7 +319,7 @@ DEFAULT_PROVIDERS = [
 
 DEFAULT_MODELS = [
     ModelConfig(
-        name="mistral-vibe-cli-latest",
+        name="devstral-2",
         provider="mistral",
         alias="devstral-2",
         input_price=0.4,

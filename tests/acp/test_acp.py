@@ -70,11 +70,11 @@ def _create_glider_home_dir(tmp_path: Path, *sections: dict[str, Any]) -> Path:
     config_file = vibe_home / "config.toml"
     base_config_dict = get_base_config()
 
-    base_config_dict["active_model"] = "devstral-latest"
+    base_config_dict["active_model"] = "devstral-2"
     if base_config_dict.get("models"):
         for model in base_config_dict["models"]:
-            if model.get("name") == "mistral-vibe-cli-latest":
-                model["alias"] = "devstral-latest"
+            if model.get("name") == "devstral-2":
+                model["alias"] = "devstral-2"
 
     if sections:
         for section_dict in sections:

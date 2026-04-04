@@ -33,7 +33,7 @@ from glider.core.llm.types import BackendLike
 
 def get_base_config() -> dict[str, Any]:
     return {
-        "active_model": "devstral-latest",
+        "active_model": "devstral-2",
         "providers": [
             {
                 "name": "mistral",
@@ -43,11 +43,7 @@ def get_base_config() -> dict[str, Any]:
             }
         ],
         "models": [
-            {
-                "name": "mistral-vibe-cli-latest",
-                "provider": "mistral",
-                "alias": "devstral-latest",
-            }
+            {"name": "devstral-2", "provider": "mistral", "alias": "devstral-2"}
         ],
         "enable_auto_update": False,
     }

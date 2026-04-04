@@ -350,7 +350,7 @@ class TestIntegration:
         assert agent_attrs["gen_ai.operation.name"] == "invoke_agent"
         assert agent_attrs["gen_ai.provider.name"] == "mistral_ai"
         assert agent_attrs["gen_ai.agent.name"] == "glider-code"
-        assert agent_attrs["gen_ai.request.model"] == "mistral-vibe-cli-latest"
+        assert agent_attrs["gen_ai.request.model"] == "devstral-2"
         assert agent_attrs["gen_ai.conversation.id"] == agent_loop.session_id
 
         # -- Tool span: name, status, and every attribute set by tool_span() + set_tool_result() --

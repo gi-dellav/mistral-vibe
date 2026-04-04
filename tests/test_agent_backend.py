@@ -26,9 +26,7 @@ from glider.core.types import Backend, EntrypointMetadata, FunctionCall, ToolCal
 def _two_model_glider_config(active_model: str) -> GliderConfig:
     """GliderConfig with two models so we can switch active_model."""
     models = [
-        ModelConfig(
-            name="mistral-vibe-cli-latest", provider="mistral", alias="devstral-latest"
-        ),
+        ModelConfig(name="devstral-2", provider="mistral", alias="devstral-2"),
         ModelConfig(
             name="devstral-small-latest", provider="mistral", alias="devstral-small"
         ),
@@ -208,7 +206,7 @@ async def test_mcp_sampling_handler_uses_updated_config_when_agent_config_change
 
     result1 = await handler(context, params)
     assert isinstance(result1, CreateMessageResult)
-    assert result1.model == "mistral-vibe-cli-latest"
+    assert result1.model == "devstral-2"
 
     agent._base_config = config2
     agent.agent_manager.invalidate_config()
