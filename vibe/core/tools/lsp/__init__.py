@@ -8,6 +8,11 @@ from vibe.core.tools.lsp.call_hierarchy import (
     CallHierarchyArgs,
     CallHierarchyResult,
 )
+from vibe.core.tools.lsp.document_symbols import (
+    DocumentSymbols,
+    DocumentSymbolsArgs,
+    DocumentSymbolsResult,
+)
 from vibe.core.tools.lsp.find_references import (
     FindReferences,
     FindReferencesArgs,
@@ -34,12 +39,20 @@ from vibe.core.tools.lsp.type_hierarchy import (
     TypeHierarchyArgs,
     TypeHierarchyResult,
 )
+from vibe.core.tools.lsp.workspace_symbols import (
+    WorkspaceSymbols,
+    WorkspaceSymbolsArgs,
+    WorkspaceSymbolsResult,
+)
 
 __all__ = [
     "BaseLSPTool",
     "CallHierarchy",
     "CallHierarchyArgs",
     "CallHierarchyResult",
+    "DocumentSymbols",
+    "DocumentSymbolsArgs",
+    "DocumentSymbolsResult",
     "FindReferences",
     "FindReferencesArgs",
     "FindReferencesResult",
@@ -60,4 +73,7 @@ __all__ = [
     "TypeHierarchy",
     "TypeHierarchyArgs",
     "TypeHierarchyResult",
+    "WorkspaceSymbols",
+    "WorkspaceSymbolsArgs",
+    "WorkspaceSymbolsResult",
 ]
