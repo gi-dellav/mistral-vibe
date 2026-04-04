@@ -5,7 +5,7 @@ import difflib
 from pathlib import Path
 import re
 import shutil
-from typing import ClassVar, NamedTuple, Optional, final
+from typing import ClassVar, NamedTuple, final
 
 import anyio
 from pydantic import BaseModel, Field
@@ -73,7 +73,6 @@ class SearchReplaceResult(BaseModel):
     lines_changed: int
     content: str
     warnings: list[str] = Field(default_factory=list)
-    lsp_diagnostics: Optional[PostEditDiagnosticsResult] = None
 
 
 class SearchReplaceConfig(BaseToolConfig):
@@ -177,20 +176,9 @@ class SearchReplace(
 
             await self._write_file(file_path, modified_content)
 
-        # Get LSP diagnostics after edit if enabled
-        lsp_diagnostics_result = None
+        # Show LSP diagnostics after edit if enabled
         if LSP_AVAILABLE:
-            try:
-                lsp_manager = get_lsp_manager()
-                config = lsp_manager.config
-                
-                # Check if diagnostics after edit are enabled
-                if config.enabled and config.show_diagnostics_after_edit:
-                    # Get diagnostics for the edited file
-                    lsp_diagnostics_result = await lsp_manager.get_diagnostics_for_file(str(file_path))
-            except Exception as e:
-                # Don't let LSP errors break the edit operation
-                logger.warning(f"Failed to get LSP diagnostics after edit: {e}")
+            await self._show_lsp_diagnostics_after_edit(file_path)
 
         yield SearchReplaceResult(
             file=str(file_path),
@@ -198,8 +186,32 @@ class SearchReplace(
             lines_changed=lines_changed,
             warnings=block_result.warnings,
             content=args.content,
-            lsp_diagnostics=lsp_diagnostics_result,
         )
+    
+    async def _show_lsp_diagnostics_after_edit(self, file_path: Path) -> None:
+        """Show LSP diagnostics after a file edit if configured."""
+        try:
+            lsp_manager = get_lsp_manager()
+            config = lsp_manager.config
+            
+            # Check if diagnostics after edit are enabled
+            if not config.enabled or not config.show_diagnostics_after_edit:
+                return
+            
+            # Get diagnostics for the edited file
+            diagnostics_result = await lsp_manager.get_diagnostics_for_file(str(file_path))
+            
+            # Only show if there are diagnostics to report
+            if diagnostics_result.diagnostics:
+                formatted_output = diagnostics_result.get_formatted_output()
+                yield ToolStreamEvent(
+                    content=formatted_output,
+                    event_type="lsp_diagnostics"
+                )
+                
+        except Exception as e:
+            # Don't let LSP errors break the edit operation
+            logger.warning(f"Failed to show LSP diagnostics after edit: {e}")
 
     @final
     def _prepare_and_validate_args(

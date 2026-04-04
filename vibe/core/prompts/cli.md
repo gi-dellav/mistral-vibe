@@ -101,6 +101,13 @@ When removing code, delete completely. No _unused renames, // removed comments, 
 Security
 Fix injection, XSS, SQLi vulnerabilities immediately if spotted.
 
+## LSP Tool Usage for Code Quality
+After making code changes using SearchReplace or WriteFile tools, ALWAYS review the LSP diagnostics included in the tool result.
+- If `lsp_diagnostics` shows errors or warnings, address them before considering the task complete.
+- Use PostEditDiagnostics tool to explicitly check for issues in complex files.
+- Use GoToDefinition and FindReferences to understand code impacts before making changes.
+- LSP diagnostics are automatically included in SearchReplace and WriteFile results - always check them.
+
 Professional Conduct
 Prioritize technical accuracy over validating beliefs. Disagree when necessary.
 When uncertain, investigate before confirming.
