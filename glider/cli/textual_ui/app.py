@@ -50,6 +50,7 @@ from glider.cli.textual_ui.notifications import (
 )
 from glider.cli.textual_ui.remote import RemoteSessionManager, is_progress_event
 from glider.cli.textual_ui.session_exit import print_session_resume_message
+from glider.cli.textual_ui.widgets.add_model_app import AddModelApp
 from glider.cli.textual_ui.widgets.approval_app import ApprovalApp
 from glider.cli.textual_ui.widgets.banner.banner import Banner
 from glider.cli.textual_ui.widgets.chat_input import ChatInputContainer
@@ -170,6 +171,7 @@ class BottomApp(StrEnum):
     """
 
     Approval = auto()
+    AddModel = auto()
     Config = auto()
     Input = auto()
     ModelPicker = auto()
@@ -1215,45 +1217,21 @@ class GliderApp(App):  # noqa: PLR0904
         await self._mount_and_scroll(UserCommandMessage(DATA_RETENTION_MESSAGE))
 
     async def _add_model(self, user_input: str) -> None:
-        from glider.core.config import ModelConfig
+        await self._switch_from_input(AddModelApp(self.config))
 
-        model_name = user_input[len("/add-model") :].strip()
-        if not model_name:
-            await self._mount_and_scroll(
-                UserCommandMessage(
-                    "Usage: /add-model <model-name>\n\nExample: /add-model anthropic/claude-3.5-sonnet"
-                )
+    async def on_add_model_app_model_added(
+        self, message: AddModelApp.ModelAdded
+    ) -> None:
+        self.config.invalidate_config()
+        await self._mount_and_scroll(
+            UserCommandMessage(
+                f"Added model '{message.alias}' to your config.\nUse /model to switch to it."
             )
-            return
-
-        alias = f"{model_name.split('/')[-1].replace('-', '-').lower()}-openrouter"
-
-        model_config = ModelConfig(
-            name=model_name,
-            provider="openrouter",
-            alias=alias,
-            temperature=0.2,
-            input_price=0.0,
-            output_price=0.0,
-            thinking="on",
         )
+        await self._switch_to_input_app()
 
-        updates = {"models": [*self.config.models, model_config.model_dump()]}
-
-        try:
-            GliderConfig.save_updates(updates)
-            self.config.invalidate_config()
-            await self._mount_and_scroll(
-                UserCommandMessage(
-                    f"Added model '{alias}' to your config.\nUse /model to switch to it."
-                )
-            )
-        except Exception as e:
-            await self._mount_and_scroll(
-                ErrorMessage(
-                    f"Failed to add model: {e}", collapsed=self._tools_collapsed
-                )
-            )
+    async def on_add_model_app_cancelled(self, _event: AddModelApp.Cancelled) -> None:
+        await self._switch_to_input_app()
 
     async def _show_session_picker(self, _: str) -> None:
         cwd = str(Path.cwd())
