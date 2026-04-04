@@ -308,18 +308,23 @@ DEFAULT_PROVIDERS = [
         name="mistral",
         api_base=f"{_DEFAULT_MISTRAL_SERVER_URL}/v1",
         api_key_env_var=DEFAULT_MISTRAL_API_ENV_KEY,
+        api_style="openai",
         backend=Backend.MISTRAL,
+        reasoning_field_name="reasoning_content",
     ),
     ProviderConfig(
         name="llamacpp",
         api_base="http://127.0.0.1:8080/v1",
-        api_key_env_var="",  # NOTE: if you wish to use --api-key in llama-server, change this value
+        api_key_env_var="",
+        api_style="openai",
+        backend=Backend.GENERIC,
+        reasoning_field_name="reasoning_content",
     ),
 ]
 
 DEFAULT_MODELS = [
     ModelConfig(
-        name="devstral-2",
+        name="mistral-vibe-cli-latest",
         provider="mistral",
         alias="devstral-2",
         input_price=0.4,
