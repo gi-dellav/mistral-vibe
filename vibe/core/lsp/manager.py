@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from pathlib import Path
 import threading
 from typing import Any
@@ -253,25 +254,35 @@ class LSPManager:
 
 _lsp_manager: LSPManager | None = None
 _lsp_manager_lock = threading.Lock()
+_lsp_config_getter: callable[[], LSPConfig] | None = None
+
+
+def set_lsp_config_getter(getter: callable[[], LSPConfig]) -> None:
+    """Set a config getter function that returns LSPConfig from VibeConfig."""
+    global _lsp_config_getter
+    _lsp_config_getter = getter
 
 
 def get_lsp_manager(config: LSPConfig | None = None) -> LSPManager:
     """Get the global LSP manager instance.
 
-    Args:
-        config: Optional LSP config to use. If not provided, uses existing manager
-               or creates a new one with default config.
+    If a config getter has been set (via set_lsp_config_getter), it will be used
+    to get the current LSPConfig from VibeConfig. Otherwise, uses the provided config
+    or falls back to default config.
 
-    Note: When running in app mode, the config should be passed from VibeConfig.lsp
-          to ensure user settings are respected. This requires integration with
-          the ToolManager's config_getter pattern.
+    This enables integration with ToolManager's config_getter pattern.
     """
     global _lsp_manager
     with _lsp_manager_lock:
+        if _lsp_config_getter is not None:
+            current_config = _lsp_config_getter()
+        else:
+            current_config = config
+
         if _lsp_manager is None:
-            _lsp_manager = LSPManager(config or get_default_lsp_config())
-        elif config is not None:
-            _lsp_manager.config = config
+            _lsp_manager = LSPManager(current_config or get_default_lsp_config())
+        elif current_config is not None:
+            _lsp_manager.config = current_config
     return _lsp_manager
 
 

@@ -9,7 +9,12 @@ from vibe.core.lsp.config import (
     PostEditDiagnosticsResult,
     get_default_lsp_config,
 )
-from vibe.core.lsp.manager import LSPManager, get_lsp_manager, shutdown_lsp_manager
+from vibe.core.lsp.manager import (
+    LSPManager,
+    get_lsp_manager,
+    set_lsp_config_getter,
+    shutdown_lsp_manager,
+)
 
 __all__ = [
     "Diagnostic",
@@ -19,5 +24,6 @@ __all__ = [
     "PostEditDiagnosticsResult",
     "get_default_lsp_config",
     "get_lsp_manager",
+    "set_lsp_config_getter",
     "shutdown_lsp_manager",
 ]

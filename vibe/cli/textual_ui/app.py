@@ -7,6 +7,7 @@ import gc
 import os
 from pathlib import Path
 import signal
+import shlex
 import subprocess
 import time
 from typing import Any, ClassVar, assert_never, cast
@@ -768,7 +769,11 @@ class VibeApp(App):  # noqa: PLR0904
 
         try:
             result = subprocess.run(
-                command, shell=True, capture_output=True, text=False, timeout=30
+                shlex.split(command),
+                shell=False,
+                capture_output=True,
+                text=False,
+                timeout=30,
             )
             stdout = (
                 result.stdout.decode("utf-8", errors="replace") if result.stdout else ""

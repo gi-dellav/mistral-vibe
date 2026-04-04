@@ -10,8 +10,9 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from vibe.core.config.harness_files import get_harness_files_manager
+from vibe.core.lsp.manager import set_lsp_config_getter
 from vibe.core.logger import logger
-from vibe.core.paths import DEFAULT_TOOL_DIR
+from vibe.core.paths import DEFAULT_TOOL_DIR, LSP_TOOL_DIR
 from vibe.core.tools.base import BaseTool, BaseToolConfig
 from vibe.core.tools.mcp import MCPRegistry
 from vibe.core.utils import name_matches
@@ -49,7 +50,9 @@ def _compute_module_name(path: Path) -> str:
         return canonical
 
     resolved = path.resolve()
-    path_hash = hashlib.md5(str(resolved).encode()).hexdigest()[:8]
+    path_hash = hashlib.md5(str(resolved).encode(), usedforsecurity=False).hexdigest()[
+        :8
+    ]
     stem = re.sub(r"[^0-9A-Za-z_]", "_", path.stem) or "mod"
     return f"vibe_tools_discovered_{stem}_{path_hash}"
 
@@ -73,6 +76,7 @@ class ToolManager:
         self._config_getter = config_getter
         self._mcp_registry = mcp_registry or MCPRegistry()
         self._instances: dict[str, BaseTool] = {}
+        set_lsp_config_getter(lambda: self._config.lsp)
         self._search_paths: list[Path] = self._compute_search_paths(self._config)
 
         self._available: dict[str, type[BaseTool]] = {
@@ -84,9 +88,11 @@ class ToolManager:
     def _config(self) -> VibeConfig:
         return self._config_getter()
 
-    @staticmethod
-    def _compute_search_paths(config: VibeConfig) -> list[Path]:
+    def _compute_search_paths(self, config: VibeConfig) -> list[Path]:
         paths: list[Path] = [DEFAULT_TOOL_DIR.path]
+
+        if config.enable_lsp_tools:
+            paths.append(LSP_TOOL_DIR.path)
 
         paths.extend(config.tool_paths)
 

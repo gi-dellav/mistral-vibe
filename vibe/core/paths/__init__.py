@@ -11,6 +11,7 @@ from vibe.core.paths._vibe_home import (
     HISTORY_FILE,
     LOG_DIR,
     LOG_FILE,
+    LSP_TOOL_DIR,
     PLANS_DIR,
     SESSION_LOG_DIR,
     TRUSTED_FOLDERS_FILE,

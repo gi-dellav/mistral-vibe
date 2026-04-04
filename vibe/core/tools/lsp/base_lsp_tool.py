@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, ClassVar
 
 from pydantic import BaseModel
 
-from vibe.core.lsp.manager import get_lsp_manager
 from vibe.core.tools.base import BaseTool, BaseToolConfig, BaseToolState, ToolError
 
 
@@ -16,10 +16,22 @@ class BaseLSPTool[ToolArgs: BaseModel, ToolResult: BaseModel](
     """Base class for all LSP tools."""
 
     description: ClassVar[str] = "Base class for LSP tools"
+    _lsp_manager_getter: ClassVar[Callable[[], Any] | None] = None
 
     def __init__(self, config: BaseToolConfig, state: Any) -> None:
         super().__init__(config, state)
-        self.lsp_manager = get_lsp_manager()
+        if BaseLSPTool._lsp_manager_getter:
+            self.lsp_manager = BaseLSPTool._lsp_manager_getter()
+        else:
+            from vibe.core.lsp.manager import get_lsp_manager
+
+            self.lsp_manager = get_lsp_manager()
+
+    @classmethod
+    def is_available(cls) -> bool:
+        from vibe.core.lsp.manager import get_lsp_manager
+
+        return get_lsp_manager().config.enabled
 
     async def _ensure_server_running(self, file_path: str) -> Any:
         """Ensure LSP server is running for the given file."""

@@ -514,7 +514,14 @@ class VibeConfig(BaseSettings):
     # LSP Configuration
     lsp: LSPConfig = Field(
         default_factory=lambda: get_default_lsp_config(),
-        description="Language Server Protocol configuration for code intelligence features."
+        description="Language Server Protocol configuration for code intelligence features.",
+    )
+    enable_lsp_tools: bool = Field(
+        default=True,
+        description=(
+            "Enable LSP-based tools (hover, go to definition, find references, etc.). "
+            "Requires LSP servers to be installed and configured."
+        ),
     )
 
     model_config = SettingsConfigDict(
