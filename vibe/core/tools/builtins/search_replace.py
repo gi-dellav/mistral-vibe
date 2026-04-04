@@ -23,6 +23,15 @@ from vibe.core.tools.ui import ToolCallDisplay, ToolResultDisplay, ToolUIData
 from vibe.core.tools.utils import resolve_file_tool_permission
 from vibe.core.types import ToolResultEvent, ToolStreamEvent
 from vibe.core.utils.io import read_safe_async
+from vibe.core.logger import logger
+
+# LSP diagnostics import
+try:
+    from vibe.core.lsp import get_lsp_manager
+    from vibe.core.lsp.config import PostEditDiagnosticsResult
+    LSP_AVAILABLE = True
+except ImportError:
+    LSP_AVAILABLE = False
 
 SEARCH_REPLACE_BLOCK_RE = re.compile(
     r"<{5,} SEARCH\r?\n(.*?)\r?\n?={5,}\r?\n(.*?)\r?\n?>{5,} REPLACE", flags=re.DOTALL
@@ -167,6 +176,10 @@ class SearchReplace(
 
             await self._write_file(file_path, modified_content)
 
+        # Show LSP diagnostics after edit if enabled
+        if LSP_AVAILABLE:
+            await self._show_lsp_diagnostics_after_edit(file_path)
+
         yield SearchReplaceResult(
             file=str(file_path),
             blocks_applied=block_result.applied,
@@ -174,6 +187,31 @@ class SearchReplace(
             warnings=block_result.warnings,
             content=args.content,
         )
+    
+    async def _show_lsp_diagnostics_after_edit(self, file_path: Path) -> None:
+        """Show LSP diagnostics after a file edit if configured."""
+        try:
+            lsp_manager = get_lsp_manager()
+            config = lsp_manager.config
+            
+            # Check if diagnostics after edit are enabled
+            if not config.enabled or not config.show_diagnostics_after_edit:
+                return
+            
+            # Get diagnostics for the edited file
+            diagnostics_result = await lsp_manager.get_diagnostics_for_file(str(file_path))
+            
+            # Only show if there are diagnostics to report
+            if diagnostics_result.diagnostics:
+                formatted_output = diagnostics_result.get_formatted_output()
+                yield ToolStreamEvent(
+                    content=formatted_output,
+                    event_type="lsp_diagnostics"
+                )
+                
+        except Exception as e:
+            # Don't let LSP errors break the edit operation
+            logger.warning(f"Failed to show LSP diagnostics after edit: {e}")
 
     @final
     def _prepare_and_validate_args(

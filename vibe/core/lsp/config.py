@@ -55,6 +55,10 @@ class LSPConfig(BaseModel):
         default=True,
         description="Automatically activate servers when files are opened"
     )
+    show_diagnostics_after_edit: bool = Field(
+        default=True,
+        description="Show LSP diagnostics automatically after file edits"
+    )
     max_retries: int = Field(
         default=1,
         description="Maximum number of retries for failed LSP requests"
@@ -84,6 +88,54 @@ class PostEditDiagnosticsResult(BaseModel):
     has_errors: bool = False
     has_warnings: bool = False
     summary: str = ""
+    
+    def get_formatted_output(self) -> str:
+        """Get formatted output for display."""
+        if not self.diagnostics:
+            return self.summary
+        
+        output = ["## LSP Diagnostics"]
+        output.append(f"**{self.summary}**")
+        output.append("")
+        
+        # Group by severity
+        errors = [d for d in self.diagnostics if d.severity == "error"]
+        warnings = [d for d in self.diagnostics if d.severity == "warning"]
+        infos = [d for d in self.diagnostics if d.severity == "info"]
+        hints = [d for d in self.diagnostics if d.severity == "hint"]
+        
+        if errors:
+            output.append("### ❌ Errors")
+            for error in errors:
+                source_part = f" *({error.source})*`" if error.source else ""
+                code_part = f" `[{error.code}]`" if error.code else ""
+                output.append(f"- **Line {error.line}**: {error.message}{code_part}{source_part}")
+            output.append("")
+        
+        if warnings:
+            output.append("### ⚠️ Warnings")
+            for warning in warnings:
+                source_part = f" *({warning.source})*`" if warning.source else ""
+                code_part = f" `[{warning.code}]`" if warning.code else ""
+                output.append(f"- **Line {warning.line}**: {warning.message}{code_part}{source_part}")
+            output.append("")
+        
+        if infos:
+            output.append("### ℹ️ Info")
+            for info in infos:
+                source_part = f" *({info.source})*`" if info.source else ""
+                code_part = f" `[{info.code}]`" if info.code else ""
+                output.append(f"- **Line {info.line}**: {info.message}{code_part}{source_part}")
+            output.append("")
+        
+        if hints:
+            output.append("### 💡 Hints")
+            for hint in hints:
+                source_part = f" *({hint.source})*`" if hint.source else ""
+                code_part = f" `[{hint.code}]`" if hint.code else ""
+                output.append(f"- **Line {hint.line}**: {hint.message}{code_part}{source_part}")
+        
+        return "\n".join(output)
 
 
 def get_default_lsp_config() -> LSPConfig:
