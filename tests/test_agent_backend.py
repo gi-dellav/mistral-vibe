@@ -27,7 +27,7 @@ def _two_model_glider_config(active_model: str) -> GliderConfig:
     """GliderConfig with two models so we can switch active_model."""
     models = [
         ModelConfig(
-            name="glider-code-cli-latest", provider="mistral", alias="devstral-latest"
+            name="mistral-vibe-cli-latest", provider="mistral", alias="devstral-latest"
         ),
         ModelConfig(
             name="devstral-small-latest", provider="mistral", alias="devstral-small"
@@ -58,7 +58,9 @@ def _make_sampling_params() -> CreateMessageRequestParams:
 
 
 @pytest.mark.asyncio
-async def test_passes_x_affinity_header_when_asking_an_answer(glider_config: GliderConfig):
+async def test_passes_x_affinity_header_when_asking_an_answer(
+    glider_config: GliderConfig,
+):
     backend = FakeBackend([mock_llm_chunk(content="Response")])
     agent = build_test_agent_loop(config=glider_config, backend=backend)
 
@@ -90,7 +92,9 @@ async def test_passes_x_affinity_header_when_asking_an_answer_streaming(
 
 
 @pytest.mark.asyncio
-async def test_updates_tokens_stats_based_on_backend_response(glider_config: GliderConfig):
+async def test_updates_tokens_stats_based_on_backend_response(
+    glider_config: GliderConfig,
+):
     chunk = mock_llm_chunk(content="Response", prompt_tokens=100, completion_tokens=50)
     backend = FakeBackend([chunk])
     agent = build_test_agent_loop(config=glider_config, backend=backend)
@@ -204,7 +208,7 @@ async def test_mcp_sampling_handler_uses_updated_config_when_agent_config_change
 
     result1 = await handler(context, params)
     assert isinstance(result1, CreateMessageResult)
-    assert result1.model == "glider-code-cli-latest"
+    assert result1.model == "mistral-vibe-cli-latest"
 
     agent._base_config = config2
     agent.agent_manager.invalidate_config()

@@ -73,7 +73,7 @@ def _create_glider_home_dir(tmp_path: Path, *sections: dict[str, Any]) -> Path:
     base_config_dict["active_model"] = "devstral-latest"
     if base_config_dict.get("models"):
         for model in base_config_dict["models"]:
-            if model.get("name") == "glider-code-cli-latest":
+            if model.get("name") == "mistral-vibe-cli-latest":
                 model["alias"] = "devstral-latest"
 
     if sections:

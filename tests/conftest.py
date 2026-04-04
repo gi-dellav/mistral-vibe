@@ -44,7 +44,7 @@ def get_base_config() -> dict[str, Any]:
         ],
         "models": [
             {
-                "name": "glider-code-cli-latest",
+                "name": "mistral-vibe-cli-latest",
                 "provider": "mistral",
                 "alias": "devstral-latest",
             }
@@ -72,7 +72,9 @@ def config_dir(
     config_file = config_dir / "config.toml"
     config_file.write_text(tomli_w.dumps(get_base_config()), encoding="utf-8")
 
-    monkeypatch.setattr("glider.core.paths._glider_home._DEFAULT_GLIDER_HOME", config_dir)
+    monkeypatch.setattr(
+        "glider.core.paths._glider_home._DEFAULT_GLIDER_HOME", config_dir
+    )
     return config_dir
 
 

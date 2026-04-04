@@ -48,7 +48,7 @@ def make_config(
 ) -> GliderConfig:
     models = [
         ModelConfig(
-            name="glider-code-cli-latest",
+            name="mistral-vibe-cli-latest",
             provider="mistral",
             alias="devstral-latest",
             input_price=input_price,
@@ -511,7 +511,9 @@ class TestAutoCompactIntegration:
             [mock_llm_chunk(content="<summary>")],
             [mock_llm_chunk(content="<final>")],
         ])
-        cfg = build_test_glider_config(models=make_test_models(auto_compact_threshold=1))
+        cfg = build_test_glider_config(
+            models=make_test_models(auto_compact_threshold=1)
+        )
         agent = build_test_agent_loop(
             config=cfg, message_observer=observer, backend=backend
         )
