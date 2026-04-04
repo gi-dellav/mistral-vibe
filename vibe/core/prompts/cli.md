@@ -102,6 +102,8 @@ Security
 Fix injection, XSS, SQLi vulnerabilities immediately if spotted.
 
 ## LSP Tool Usage for Code Quality
+MUST use LSP tools (GoToDefinition, FindReferences, Hover, etc.) for all code navigation and understanding tasks.
+MUST review and address all LSP diagnostics shown in edit operation results before task completion.
 After making code changes using SearchReplace or WriteFile tools, ALWAYS review the LSP diagnostics included in the tool result.
 - If `lsp_diagnostics` shows errors or warnings, address them before considering the task complete.
 - Use PostEditDiagnostics tool to explicitly check for issues in complex files.
