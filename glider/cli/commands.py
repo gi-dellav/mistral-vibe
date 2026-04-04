@@ -110,6 +110,11 @@ class CommandRegistry:
                 description="Show data retention information",
                 handler="_show_data_retention",
             ),
+            "add-model": Command(
+                aliases=frozenset(["/add-model"]),
+                description="Add a model hosted on OpenRouter",
+                handler="_add_model",
+            ),
         }
 
         for command in excluded_commands:

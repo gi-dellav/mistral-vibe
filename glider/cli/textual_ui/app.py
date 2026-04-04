@@ -434,7 +434,7 @@ class GliderApp(App):  # noqa: PLR0904
         chat_input_container = self.query_one(ChatInputContainer)
         chat_input_container.focus_input()
         await self._resolve_plan()
-        await self._show_dangerous_directory_warning()
+        await self._show_dangerous_directory_warning("")
         await self._resume_history_from_messages()
         await self._check_and_show_whats_new()
         self._schedule_update_notification()
@@ -443,7 +443,7 @@ class GliderApp(App):  # noqa: PLR0904
         self.call_after_refresh(self._refresh_banner)
 
         if self._show_resume_picker:
-            self.run_worker(self._show_session_picker(), exclusive=False)
+            self.run_worker(self._show_session_picker(""), exclusive=False)
         elif self._initial_prompt or self._teleport_on_start:
             self.call_after_refresh(self._process_initial_prompt)
 
@@ -575,7 +575,7 @@ class GliderApp(App):  # noqa: PLR0904
         changes = config_app._convert_changes_for_save()
         if changes:
             GliderConfig.save_updates(changes)
-            await self._reload_config()
+            await self._reload_config("")
         await self._switch_to_input_app()
         await self._switch_to_model_picker_app()
 
@@ -609,7 +609,7 @@ class GliderApp(App):  # noqa: PLR0904
     ) -> None:
         if changes:
             GliderConfig.save_updates(changes)
-            await self._reload_config()
+            await self._reload_config("")
         else:
             await self._mount_and_scroll(
                 UserCommandMessage("Configuration closed (no changes saved).")
@@ -656,7 +656,7 @@ class GliderApp(App):  # noqa: PLR0904
         self, message: ModelPickerApp.ModelSelected
     ) -> None:
         GliderConfig.save_updates({"active_model": message.alias})
-        await self._reload_config()
+        await self._reload_config("")
         await self._switch_to_input_app()
 
     async def on_model_picker_app_cancelled(
@@ -709,9 +709,9 @@ class GliderApp(App):  # noqa: PLR0904
             await self._mount_and_scroll(UserMessage(user_input))
             handler = getattr(self, command.handler)
             if asyncio.iscoroutinefunction(handler):
-                await handler()
+                await handler(user_input)
             else:
-                handler()
+                handler(user_input)
             return True
         return False
 
@@ -1025,7 +1025,7 @@ class GliderApp(App):  # noqa: PLR0904
             return "Rate limits exceeded. Please wait a moment before trying again, or upgrade to Pro for higher rate limits and uninterrupted access."
         return "Rate limits exceeded. Please wait a moment before trying again."
 
-    async def _teleport_command(self) -> None:
+    async def _teleport_command(self, _: str) -> None:
         await self._handle_teleport_command(show_message=False)
 
     async def _handle_teleport_command(
@@ -1177,11 +1177,11 @@ class GliderApp(App):  # noqa: PLR0904
 
         self._interrupt_requested = False
 
-    async def _show_help(self) -> None:
+    async def _show_help(self, _: str) -> None:
         help_text = self.commands.get_help_text()
         await self._mount_and_scroll(UserCommandMessage(help_text))
 
-    async def _show_status(self) -> None:
+    async def _show_status(self, _: str) -> None:
         stats = self.agent_loop.stats
         status_text = f"""## Agent Statistics
 
@@ -1194,27 +1194,68 @@ class GliderApp(App):  # noqa: PLR0904
 """
         await self._mount_and_scroll(UserCommandMessage(status_text))
 
-    async def _show_config(self) -> None:
+    async def _show_config(self, _: str) -> None:
         """Switch to the configuration app in the bottom panel."""
         if self._current_bottom_app == BottomApp.Config:
             return
         await self._switch_to_config_app()
 
-    async def _show_model(self) -> None:
+    async def _show_model(self, _: str) -> None:
         """Switch to the model picker in the bottom panel."""
         if self._current_bottom_app == BottomApp.ModelPicker:
             return
         await self._switch_to_model_picker_app()
 
-    async def _show_proxy_setup(self) -> None:
+    async def _show_proxy_setup(self, _: str) -> None:
         if self._current_bottom_app == BottomApp.ProxySetup:
             return
         await self._switch_to_proxy_setup_app()
 
-    async def _show_data_retention(self) -> None:
+    async def _show_data_retention(self, _: str) -> None:
         await self._mount_and_scroll(UserCommandMessage(DATA_RETENTION_MESSAGE))
 
-    async def _show_session_picker(self) -> None:
+    async def _add_model(self, user_input: str) -> None:
+        from glider.core.config import ModelConfig
+
+        model_name = user_input[len("/add-model") :].strip()
+        if not model_name:
+            await self._mount_and_scroll(
+                UserCommandMessage(
+                    "Usage: /add-model <model-name>\n\nExample: /add-model anthropic/claude-3.5-sonnet"
+                )
+            )
+            return
+
+        alias = f"{model_name.split('/')[-1].replace('-', '-').lower()}-openrouter"
+
+        model_config = ModelConfig(
+            name=model_name,
+            provider="openrouter",
+            alias=alias,
+            temperature=0.2,
+            input_price=0.0,
+            output_price=0.0,
+            thinking="on",
+        )
+
+        updates = {"models": [*self.config.models, model_config.model_dump()]}
+
+        try:
+            GliderConfig.save_updates(updates)
+            self.config.invalidate_config()
+            await self._mount_and_scroll(
+                UserCommandMessage(
+                    f"Added model '{alias}' to your config.\nUse /model to switch to it."
+                )
+            )
+        except Exception as e:
+            await self._mount_and_scroll(
+                ErrorMessage(
+                    f"Failed to add model: {e}", collapsed=self._tools_collapsed
+                )
+            )
+
+    async def _show_session_picker(self, _: str) -> None:
         cwd = str(Path.cwd())
         local_sessions = (
             list_local_resume_sessions(self.config, cwd)
@@ -1410,7 +1451,7 @@ class GliderApp(App):  # noqa: PLR0904
     def loading_widget(self) -> LoadingWidget | None:
         return self._loading_widget
 
-    async def _reload_config(self) -> None:
+    async def _reload_config(self, _: str) -> None:
         try:
             self._reset_ui_state()
             await self._load_more.hide()
@@ -1435,7 +1476,7 @@ class GliderApp(App):  # noqa: PLR0904
                 )
             )
 
-    async def _install_lean(self) -> None:
+    async def _install_lean(self, _: str) -> None:
         current = list(self.agent_loop.base_config.installed_agents)
         if "lean" in current:
             await self._mount_and_scroll(
@@ -1443,9 +1484,9 @@ class GliderApp(App):  # noqa: PLR0904
             )
             return
         GliderConfig.save_updates({"installed_agents": sorted([*current, "lean"])})
-        await self._reload_config()
+        await self._reload_config("")
 
-    async def _uninstall_lean(self) -> None:
+    async def _uninstall_lean(self, _: str) -> None:
         current = list(self.agent_loop.base_config.installed_agents)
         if "lean" not in current:
             await self._mount_and_scroll(
@@ -1455,9 +1496,9 @@ class GliderApp(App):  # noqa: PLR0904
         GliderConfig.save_updates({
             "installed_agents": [a for a in current if a != "lean"]
         })
-        await self._reload_config()
+        await self._reload_config("")
 
-    async def _clear_history(self) -> None:
+    async def _clear_history(self, _: str) -> None:
         try:
             self._reset_ui_state()
             if self._remote_manager.is_active:
@@ -1487,7 +1528,7 @@ class GliderApp(App):  # noqa: PLR0904
                 )
             )
 
-    async def _show_log_path(self) -> None:
+    async def _show_log_path(self, _: str) -> None:
         if not self.agent_loop.session_logger.enabled:
             await self._mount_and_scroll(
                 ErrorMessage(
@@ -1511,7 +1552,7 @@ class GliderApp(App):  # noqa: PLR0904
                 )
             )
 
-    async def _compact_history(self) -> None:
+    async def _compact_history(self, _: str) -> None:
         if self._agent_running:
             await self._mount_and_scroll(
                 ErrorMessage(
@@ -1575,11 +1616,11 @@ class GliderApp(App):  # noqa: PLR0904
             return None
         return short_session_id(self.agent_loop.session_logger.session_id)
 
-    async def _exit_app(self) -> None:
+    async def _exit_app(self, _: str) -> None:
         await self._narrator_manager.close()
         self.exit(result=self._get_session_resume_info())
 
-    async def _setup_terminal(self) -> None:
+    async def _setup_terminal(self, _: str) -> None:
         result = setup_terminal()
 
         if result.success:
@@ -1617,7 +1658,7 @@ class GliderApp(App):  # noqa: PLR0904
             telemetry_client=self.agent_loop.telemetry_client,
         )
 
-    async def _show_voice_settings(self) -> None:
+    async def _show_voice_settings(self, _: str) -> None:
         if self._current_bottom_app == BottomApp.Voice:
             return
         await self._switch_to_voice_app()
@@ -1799,7 +1840,7 @@ class GliderApp(App):  # noqa: PLR0904
             if isinstance(child, UserMessage) and child.message_index is not None
         ]
 
-    def _start_rewind_mode(self) -> None:
+    def _start_rewind_mode(self, _: str) -> None:
         self.action_rewind_prev()
 
     def action_rewind_prev(self) -> None:
@@ -1920,7 +1961,7 @@ class GliderApp(App):  # noqa: PLR0904
             self._rewind_highlighted_widget = None
         self._rewind_mode = False
 
-    async def _exit_rewind_mode(self) -> None:
+    async def _exit_rewind_mode(self, _: str) -> None:
         """Exit rewind mode and restore the input panel."""
         self._clear_rewind_state()
         await self._switch_to_input_app()
@@ -2033,7 +2074,7 @@ class GliderApp(App):  # noqa: PLR0904
             return
 
         if self._current_bottom_app == BottomApp.Rewind:
-            self.run_worker(self._exit_rewind_mode(), exclusive=False)
+            self.run_worker(self._exit_rewind_mode(""), exclusive=False)
             self._last_escape_time = None
             return
 
@@ -2207,7 +2248,7 @@ class GliderApp(App):  # noqa: PLR0904
         except Exception:
             pass
 
-    async def _show_dangerous_directory_warning(self) -> None:
+    async def _show_dangerous_directory_warning(self, _: str) -> None:
         is_dangerous, reason = is_dangerous_directory()
         if is_dangerous:
             warning = (

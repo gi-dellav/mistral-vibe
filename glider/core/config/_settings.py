@@ -253,7 +253,7 @@ class ModelConfig(BaseModel):
     temperature: float = 0.2
     input_price: float = 0.0  # Price per million input tokens
     output_price: float = 0.0  # Price per million output tokens
-    thinking: Literal["off", "low", "medium", "high"] = "off"
+    thinking: Literal["off", "on", "low", "medium", "high"] = "off"
     auto_compact_threshold: int = 200_000
 
     _default_alias_to_name = model_validator(mode="before")(_default_alias_to_name)
@@ -320,6 +320,14 @@ DEFAULT_PROVIDERS = [
         backend=Backend.GENERIC,
         reasoning_field_name="reasoning_content",
     ),
+    ProviderConfig(
+        name="openrouter",
+        api_base="https://openrouter.ai/api/v1",
+        api_key_env_var="OPENROUTER_API_KEY",
+        api_style="openai",
+        backend=Backend.GENERIC,
+        reasoning_field_name="reasoning_content",
+    ),
 ]
 
 DEFAULT_MODELS = [
@@ -329,6 +337,7 @@ DEFAULT_MODELS = [
         alias="devstral-2",
         input_price=0.4,
         output_price=2.0,
+        thinking="low",
     ),
     ModelConfig(
         name="devstral-small-latest",
@@ -336,6 +345,7 @@ DEFAULT_MODELS = [
         alias="devstral-small",
         input_price=0.1,
         output_price=0.3,
+        thinking="low",
     ),
     ModelConfig(
         name="devstral",
@@ -343,6 +353,7 @@ DEFAULT_MODELS = [
         alias="local",
         input_price=0.0,
         output_price=0.0,
+        thinking="low",
     ),
 ]
 
@@ -854,6 +865,9 @@ class GliderConfig(BaseSettings):
     def load(cls, **overrides: Any) -> GliderConfig:
         cls._migrate()
         return cls(**(overrides or {}))
+
+    def invalidate_config(self) -> None:
+        pass
 
     @classmethod
     def create_default(cls) -> dict[str, Any]:
