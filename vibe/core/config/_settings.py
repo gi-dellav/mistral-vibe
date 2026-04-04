@@ -23,6 +23,7 @@ import tomli_w
 
 from vibe.core.config.harness_files import get_harness_files_manager
 from vibe.core.logger import logger
+from vibe.core.lsp.config import LSPConfig, get_default_lsp_config
 from vibe.core.paths import GLOBAL_ENV_FILE, SESSION_LOG_DIR
 from vibe.core.prompts import SystemPrompt
 from vibe.core.types import Backend
@@ -508,6 +509,12 @@ class VibeConfig(BaseSettings):
             "A list of skill names/patterns to disable. Ignored if 'enabled_skills'"
             " is set. Supports glob patterns and regex with 're:' prefix."
         ),
+    )
+
+    # LSP Configuration
+    lsp: LSPConfig = Field(
+        default_factory=lambda: get_default_lsp_config(),
+        description="Language Server Protocol configuration for code intelligence features."
     )
 
     model_config = SettingsConfigDict(

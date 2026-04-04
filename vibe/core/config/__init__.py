@@ -29,6 +29,7 @@ from vibe.core.config._settings import (
     VibeConfig,
     load_dotenv_values,
 )
+from vibe.core.lsp.config import LSPConfig
 
 __all__ = [
     "DEFAULT_MISTRAL_API_ENV_KEY",
@@ -38,6 +39,7 @@ __all__ = [
     "DEFAULT_TRANSCRIBE_PROVIDERS",
     "DEFAULT_TTS_MODELS",
     "DEFAULT_TTS_PROVIDERS",
+    "LSPConfig",
     "MCPHttp",
     "MCPServer",
     "MCPStdio",
