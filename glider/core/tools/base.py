@@ -269,6 +269,11 @@ class BaseTool[
                 f"{cls.__name__}.run args annotation must be a Pydantic model; "
                 f"got {args_model!r}"
             )
+        if args_model is BaseModel:
+            raise TypeError(
+                f"{cls.__name__}.run args annotation must be a concrete Pydantic model, "
+                f"not BaseModel itself"
+            )
 
         if not issubclass(result_model, BaseModel):
             raise TypeError(

@@ -26,7 +26,13 @@ class LSPStatusResult(BaseModel):
     )
 
 
-class LSPStatus(BaseTool[BaseModel, LSPStatusResult, BaseToolConfig, BaseToolState]):
+class NoArgs(BaseModel):
+    """Placeholder for tools that don't require arguments."""
+
+    pass
+
+
+class LSPStatus(BaseTool[NoArgs, LSPStatusResult, BaseToolConfig, BaseToolState]):
     """Get current LSP status and server information."""
 
     description: ClassVar[str] = (
@@ -35,7 +41,7 @@ class LSPStatus(BaseTool[BaseModel, LSPStatusResult, BaseToolConfig, BaseToolSta
     )
 
     async def run(
-        self, args: BaseModel, ctx: InvokeContext | None = None
+        self, args: NoArgs, ctx: InvokeContext | None = None
     ) -> AsyncGenerator[ToolStreamEvent | LSPStatusResult, None]:
         try:
             lsp_manager = get_lsp_manager()
@@ -68,7 +74,7 @@ class LSPRestartResult(BaseModel):
     message: str = Field(description="Status message")
 
 
-class LSPRestart(BaseTool[BaseModel, LSPRestartResult, BaseToolConfig, BaseToolState]):
+class LSPRestart(BaseTool[NoArgs, LSPRestartResult, BaseToolConfig, BaseToolState]):
     """Restart all LSP servers."""
 
     description: ClassVar[str] = (
@@ -77,7 +83,7 @@ class LSPRestart(BaseTool[BaseModel, LSPRestartResult, BaseToolConfig, BaseToolS
     )
 
     async def run(
-        self, args: BaseModel, ctx: InvokeContext | None = None
+        self, args: NoArgs, ctx: InvokeContext | None = None
     ) -> AsyncGenerator[ToolStreamEvent | LSPRestartResult, None]:
         try:
             lsp_manager = get_lsp_manager()
