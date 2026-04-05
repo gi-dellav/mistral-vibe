@@ -115,6 +115,16 @@ class CommandRegistry:
                 description="Add a model hosted on OpenRouter",
                 handler="_add_model",
             ),
+            "discover-mcp": Command(
+                aliases=frozenset(["/discover-mcp"]),
+                description="Discover and enable MCP servers",
+                handler="_show_discover_mcp",
+            ),
+            "discover-skills": Command(
+                aliases=frozenset(["/discover-skills"]),
+                description="Discover and enable skills",
+                handler="_show_discover_skills",
+            ),
         }
 
         for command in excluded_commands:

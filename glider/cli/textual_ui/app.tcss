@@ -1128,6 +1128,34 @@ NarratorStatus {
     margin-top: 1;
 }
 
+#discover-mcp-app {
+    width: 100%;
+    height: auto;
+    background: transparent;
+    border: solid ansi_bright_black;
+    padding: 0 1;
+    margin: 0;
+}
+
+#discover-mcp-content {
+    width: 100%;
+    height: auto;
+}
+
+#discover-skills-app {
+    width: 100%;
+    height: auto;
+    background: transparent;
+    border: solid ansi_bright_black;
+    padding: 0 1;
+    margin: 0;
+}
+
+#discover-skills-content {
+    width: 100%;
+    height: auto;
+}
+
 FeedbackBar {
     width: auto;
     height: auto;
