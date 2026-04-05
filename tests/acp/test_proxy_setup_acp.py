@@ -10,12 +10,12 @@ import pytest
 from tests.acp.conftest import _create_acp_agent
 from tests.conftest import build_test_glider_config
 from tests.stubs.fake_client import FakeClient
-from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.acp.acp_agent_loop import GliderAcpAgentLoop
 from glider.core.agent_loop import AgentLoop
 
 
 @pytest.fixture
-def acp_agent_loop(backend) -> VibeAcpAgentLoop:
+def acp_agent_loop(backend) -> GliderAcpAgentLoop:
     config = build_test_glider_config()
 
     class PatchedAgentLoop(AgentLoop):
@@ -29,7 +29,7 @@ def acp_agent_loop(backend) -> VibeAcpAgentLoop:
     return _create_acp_agent()
 
 
-def _get_fake_client(acp_agent_loop: VibeAcpAgentLoop) -> FakeClient:
+def _get_fake_client(acp_agent_loop: GliderAcpAgentLoop) -> FakeClient:
     assert isinstance(acp_agent_loop.client, FakeClient)
     return acp_agent_loop.client
 
@@ -37,7 +37,7 @@ def _get_fake_client(acp_agent_loop: VibeAcpAgentLoop) -> FakeClient:
 class TestAvailableCommandsUpdate:
     @pytest.mark.asyncio
     async def test_available_commands_sent_on_new_session(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         await acp_agent_loop.new_session(cwd=str(Path.cwd()), mcp_servers=[])
 
@@ -58,7 +58,7 @@ class TestAvailableCommandsUpdate:
 
     @pytest.mark.asyncio
     async def test_data_retention_command_sent_on_new_session(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         await acp_agent_loop.new_session(cwd=str(Path.cwd()), mcp_servers=[])
 
@@ -82,7 +82,7 @@ class TestProxySetupCommand:
     @pytest.mark.asyncio
     async def test_proxy_setup_shows_help_when_no_args(
         self,
-        acp_agent_loop: VibeAcpAgentLoop,
+        acp_agent_loop: GliderAcpAgentLoop,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -122,7 +122,7 @@ class TestProxySetupCommand:
     @pytest.mark.asyncio
     async def test_proxy_setup_sets_value(
         self,
-        acp_agent_loop: VibeAcpAgentLoop,
+        acp_agent_loop: GliderAcpAgentLoop,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -173,7 +173,7 @@ class TestProxySetupMessageId:
     @pytest.mark.asyncio
     async def test_proxy_setup_response_has_user_message_id(
         self,
-        acp_agent_loop: VibeAcpAgentLoop,
+        acp_agent_loop: GliderAcpAgentLoop,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -200,7 +200,7 @@ class TestProxySetupMessageId:
     @pytest.mark.asyncio
     async def test_proxy_setup_echoes_client_message_id(
         self,
-        acp_agent_loop: VibeAcpAgentLoop,
+        acp_agent_loop: GliderAcpAgentLoop,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -229,7 +229,7 @@ class TestProxySetupMessageId:
     @pytest.mark.asyncio
     async def test_proxy_setup_agent_message_has_message_id(
         self,
-        acp_agent_loop: VibeAcpAgentLoop,
+        acp_agent_loop: GliderAcpAgentLoop,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -263,7 +263,7 @@ class TestProxySetupMessageId:
     @pytest.mark.asyncio
     async def test_proxy_setup_unsets_value(
         self,
-        acp_agent_loop: VibeAcpAgentLoop,
+        acp_agent_loop: GliderAcpAgentLoop,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -307,7 +307,7 @@ class TestProxySetupMessageId:
     @pytest.mark.asyncio
     async def test_proxy_setup_invalid_key_returns_error(
         self,
-        acp_agent_loop: VibeAcpAgentLoop,
+        acp_agent_loop: GliderAcpAgentLoop,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -349,7 +349,7 @@ class TestProxySetupMessageId:
     @pytest.mark.asyncio
     async def test_proxy_setup_case_insensitive(
         self,
-        acp_agent_loop: VibeAcpAgentLoop,
+        acp_agent_loop: GliderAcpAgentLoop,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -388,7 +388,7 @@ class TestProxySetupMessageId:
 class TestDataRetentionCommand:
     @pytest.mark.asyncio
     async def test_data_retention_returns_notice(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]

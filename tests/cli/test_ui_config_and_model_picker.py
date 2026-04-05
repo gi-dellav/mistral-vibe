@@ -28,7 +28,7 @@ async def test_config_opens_config_app() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_config()
+        await app._show_config("")
         await pilot.pause(0.2)
 
         assert app._current_bottom_app == BottomApp.Config
@@ -40,7 +40,7 @@ async def test_config_escape_returns_to_input() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_config()
+        await app._show_config("")
         await pilot.pause(0.2)
 
         await pilot.press("escape")
@@ -57,7 +57,7 @@ async def test_config_toggle_autocopy() -> None:
     app = build_test_glider_app(config=config)
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_config()
+        await app._show_config("")
         await pilot.pause(0.2)
 
         # Navigate down to Auto-copy (second item) and toggle
@@ -77,7 +77,7 @@ async def test_config_escape_saves_changes() -> None:
     app = build_test_glider_app(config=config)
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_config()
+        await app._show_config("")
         await pilot.pause(0.2)
 
         # Toggle auto-copy
@@ -102,7 +102,7 @@ async def test_model_opens_model_picker() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_model()
+        await app._show_model("")
         await pilot.pause(0.2)
 
         assert app._current_bottom_app == BottomApp.ModelPicker
@@ -114,7 +114,7 @@ async def test_model_picker_shows_all_models() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_model()
+        await app._show_model("")
         await pilot.pause(0.2)
 
         picker = app.query_one(ModelPickerApp)
@@ -127,7 +127,7 @@ async def test_model_picker_escape_returns_to_input() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_model()
+        await app._show_model("")
         await pilot.pause(0.2)
 
         await pilot.press("escape")
@@ -142,7 +142,7 @@ async def test_model_picker_escape_does_not_save() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_model()
+        await app._show_model("")
         await pilot.pause(0.2)
 
         with patch("vibe.cli.textual_ui.app.GliderConfig.save_updates") as mock_save:
@@ -157,7 +157,7 @@ async def test_model_picker_select_model() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_model()
+        await app._show_model("")
         await pilot.pause(0.2)
 
         # Navigate down to "beta" and select
@@ -178,7 +178,7 @@ async def test_model_picker_select_current_model() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_model()
+        await app._show_model("")
         await pilot.pause(0.2)
 
         with patch("vibe.cli.textual_ui.app.GliderConfig.save_updates") as mock_save:
@@ -199,7 +199,7 @@ async def test_config_model_entry_opens_model_picker() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_config()
+        await app._show_config("")
         await pilot.pause(0.2)
 
         # Model row is the first item, already highlighted. Press enter.
@@ -217,7 +217,7 @@ async def test_config_to_model_picker_escape_returns_to_input() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_config()
+        await app._show_config("")
         await pilot.pause(0.2)
 
         # Open model picker from config
@@ -239,7 +239,7 @@ async def test_config_to_model_picker_select_returns_to_input() -> None:
     app = build_test_glider_app(config=_make_config_with_models())
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_config()
+        await app._show_config("")
         await pilot.pause(0.2)
 
         # Open model picker from config
@@ -265,7 +265,7 @@ async def test_config_pending_changes_saved_before_model_picker() -> None:
     app = build_test_glider_app(config=config)
     async with app.run_test() as pilot:
         await pilot.pause(0.1)
-        await app._show_config()
+        await app._show_config("")
         await pilot.pause(0.2)
 
         # Toggle auto-copy (second row)

@@ -12,7 +12,7 @@ from tests.acp.conftest import _create_acp_agent
 from tests.conftest import build_test_glider_config
 from tests.stubs.fake_backend import FakeBackend
 from tests.stubs.fake_client import FakeClient
-from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.acp.acp_agent_loop import GliderAcpAgentLoop
 from glider.core.agent_loop import AgentLoop
 from glider.core.config import SessionLoggingConfig
 from glider.core.types import LLMChunk, LLMMessage, LLMUsage, Role
@@ -29,7 +29,7 @@ def _make_backend(prompt_tokens: int = 100, completion_tokens: int = 50) -> Fake
     )
 
 
-def _make_acp_agent(backend: FakeBackend) -> VibeAcpAgentLoop:
+def _make_acp_agent(backend: FakeBackend) -> GliderAcpAgentLoop:
     config = build_test_glider_config()
 
     class PatchedAgentLoop(AgentLoop):
@@ -42,7 +42,7 @@ def _make_acp_agent(backend: FakeBackend) -> VibeAcpAgentLoop:
     return _create_acp_agent()
 
 
-def _get_fake_client(agent: VibeAcpAgentLoop) -> FakeClient:
+def _get_fake_client(agent: GliderAcpAgentLoop) -> FakeClient:
     return agent.client  # type: ignore[return-value]
 
 
@@ -220,7 +220,7 @@ class TestLoadSessionUsageUpdate:
 
     def _make_agent_with_session_logging(
         self, backend: FakeBackend, session_dir: Path
-    ) -> VibeAcpAgentLoop:
+    ) -> GliderAcpAgentLoop:
         session_config = SessionLoggingConfig(
             save_dir=str(session_dir), session_prefix="session", enabled=True
         )

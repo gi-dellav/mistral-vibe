@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncGenerator
 from pathlib import Path
-from typing import ClassVar, Optional, final
+from typing import TYPE_CHECKING, ClassVar, Optional, final
 
 import anyio
 from pydantic import BaseModel, Field
@@ -29,6 +29,10 @@ try:
     LSP_AVAILABLE = True
 except ImportError:
     LSP_AVAILABLE = False
+
+if TYPE_CHECKING:
+    from glider.core.lsp import get_lsp_manager  # noqa: F401
+    from glider.core.lsp.config import PostEditDiagnosticsResult
 
 
 class WriteFileArgs(BaseModel):
@@ -113,7 +117,7 @@ class WriteFile(
             try:
                 lsp_manager = get_lsp_manager()
                 config = lsp_manager.config
-                
+
                 # Check if diagnostics after edit are enabled
                 if config.enabled and config.show_diagnostics_after_edit:
                     # Get diagnostics for the edited file

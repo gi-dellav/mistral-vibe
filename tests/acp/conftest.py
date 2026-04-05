@@ -9,7 +9,7 @@ import pytest
 
 from tests.stubs.fake_backend import FakeBackend
 from tests.stubs.fake_client import FakeClient
-from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.acp.acp_agent_loop import GliderAcpAgentLoop
 from glider.core.agent_loop import AgentLoop
 from glider.core.types import LLMChunk, LLMMessage, LLMUsage, Role
 
@@ -25,8 +25,8 @@ def backend() -> FakeBackend:
     return backend
 
 
-def _create_acp_agent() -> VibeAcpAgentLoop:
-    vibe_acp_agent = VibeAcpAgentLoop()
+def _create_acp_agent() -> GliderAcpAgentLoop:
+    vibe_acp_agent = GliderAcpAgentLoop()
     client = FakeClient()
 
     vibe_acp_agent.on_connect(client)
@@ -36,7 +36,7 @@ def _create_acp_agent() -> VibeAcpAgentLoop:
 
 
 @pytest.fixture
-def acp_agent_loop(backend: FakeBackend) -> VibeAcpAgentLoop:
+def acp_agent_loop(backend: FakeBackend) -> GliderAcpAgentLoop:
     class PatchedAgent(AgentLoop):
         def __init__(self, *args, **kwargs) -> None:
             super().__init__(*args, **kwargs, backend=backend)

@@ -9,7 +9,7 @@ from tests.snapshots.snap_compare import SnapCompare
 class DataRetentionTestApp(BaseSnapshotTestApp):
     async def on_mount(self) -> None:
         await super().on_mount()
-        await self._show_data_retention()
+        await self._show_data_retention("")
 
 
 def test_snapshot_data_retention(snap_compare: SnapCompare) -> None:

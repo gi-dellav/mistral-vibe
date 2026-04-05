@@ -7,14 +7,14 @@ import pytest
 
 from tests.acp.conftest import _create_acp_agent
 from tests.conftest import build_test_glider_config
-from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.acp.acp_agent_loop import GliderAcpAgentLoop
 from glider.core.agent_loop import AgentLoop
 from glider.core.agents.models import BuiltinAgentName
 from glider.core.config import ModelConfig
 
 
 @pytest.fixture
-def acp_agent_loop(backend) -> VibeAcpAgentLoop:
+def acp_agent_loop(backend) -> GliderAcpAgentLoop:
     config = build_test_glider_config(
         active_model="devstral-latest",
         models=[
@@ -41,7 +41,7 @@ def acp_agent_loop(backend) -> VibeAcpAgentLoop:
 class TestACPNewSession:
     @pytest.mark.asyncio
     async def test_new_session_response_structure(
-        self, acp_agent_loop: VibeAcpAgentLoop, telemetry_events: list[dict]
+        self, acp_agent_loop: GliderAcpAgentLoop, telemetry_events: list[dict]
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -128,7 +128,7 @@ class TestACPNewSession:
     @pytest.mark.skip(reason="TODO: Fix this test")
     @pytest.mark.asyncio
     async def test_new_session_preserves_model_after_set_model(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]

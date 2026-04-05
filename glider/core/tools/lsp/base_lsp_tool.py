@@ -20,8 +20,9 @@ class BaseLSPTool[ToolArgs: BaseModel, ToolResult: BaseModel](
 
     def __init__(self, config: BaseToolConfig, state: Any) -> None:
         super().__init__(config, state)
-        if BaseLSPTool._lsp_manager_getter:
-            self.lsp_manager = BaseLSPTool._lsp_manager_getter()
+        cls = type(self)
+        if cls._lsp_manager_getter:
+            self.lsp_manager = cls._lsp_manager_getter()
         else:
             from glider.core.lsp.manager import get_lsp_manager
 

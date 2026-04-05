@@ -7,14 +7,14 @@ import pytest
 
 from tests.acp.conftest import _create_acp_agent
 from tests.conftest import build_test_glider_config
-from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.acp.acp_agent_loop import GliderAcpAgentLoop
 from glider.core.agent_loop import AgentLoop
 from glider.core.config import ModelConfig, GliderConfig
 from glider.core.types import LLMMessage, Role
 
 
 @pytest.fixture
-def acp_agent_loop(backend) -> VibeAcpAgentLoop:
+def acp_agent_loop(backend) -> GliderAcpAgentLoop:
     config = build_test_glider_config(
         active_model="devstral-latest",
         models=[
@@ -56,7 +56,7 @@ def acp_agent_loop(backend) -> VibeAcpAgentLoop:
 
 class TestACPSetModel:
     @pytest.mark.asyncio
-    async def test_set_model_success(self, acp_agent_loop: VibeAcpAgentLoop) -> None:
+    async def test_set_model_success(self, acp_agent_loop: GliderAcpAgentLoop) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
         )
@@ -76,7 +76,7 @@ class TestACPSetModel:
 
     @pytest.mark.asyncio
     async def test_set_model_invalid_model_returns_none(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -97,7 +97,7 @@ class TestACPSetModel:
 
     @pytest.mark.asyncio
     async def test_set_model_to_same_model(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -119,7 +119,7 @@ class TestACPSetModel:
 
     @pytest.mark.asyncio
     async def test_set_model_saves_to_config(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -136,7 +136,7 @@ class TestACPSetModel:
 
     @pytest.mark.asyncio
     async def test_set_model_does_not_save_on_invalid_model(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -153,7 +153,7 @@ class TestACPSetModel:
 
     @pytest.mark.asyncio
     async def test_set_model_with_empty_string(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -175,7 +175,7 @@ class TestACPSetModel:
 
     @pytest.mark.asyncio
     async def test_set_model_updates_active_model(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -199,7 +199,7 @@ class TestACPSetModel:
 
     @pytest.mark.asyncio
     async def test_set_model_calls_reload_with_initial_messages(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -225,7 +225,7 @@ class TestACPSetModel:
 
     @pytest.mark.asyncio
     async def test_set_model_preserves_conversation_history(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -255,7 +255,7 @@ class TestACPSetModel:
 
     @pytest.mark.asyncio
     async def test_set_model_resets_stats_with_new_model_pricing(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]

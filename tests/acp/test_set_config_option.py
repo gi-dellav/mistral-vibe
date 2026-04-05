@@ -7,14 +7,14 @@ import pytest
 
 from tests.acp.conftest import _create_acp_agent
 from tests.conftest import build_test_glider_config
-from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.acp.acp_agent_loop import GliderAcpAgentLoop
 from glider.core.agent_loop import AgentLoop
 from glider.core.agents.models import BuiltinAgentName
 from glider.core.config import ModelConfig, GliderConfig
 
 
 @pytest.fixture
-def acp_agent_loop(backend) -> VibeAcpAgentLoop:
+def acp_agent_loop(backend) -> GliderAcpAgentLoop:
     config = build_test_glider_config(
         active_model="devstral-latest",
         models=[
@@ -57,7 +57,7 @@ def acp_agent_loop(backend) -> VibeAcpAgentLoop:
 class TestACPSetConfigOptionMode:
     @pytest.mark.asyncio
     async def test_set_config_option_mode_to_auto_approve(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -88,7 +88,7 @@ class TestACPSetConfigOptionMode:
 
     @pytest.mark.asyncio
     async def test_set_config_option_mode_to_plan(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -108,7 +108,7 @@ class TestACPSetConfigOptionMode:
 
     @pytest.mark.asyncio
     async def test_set_config_option_mode_to_chat(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -138,7 +138,7 @@ class TestACPSetConfigOptionMode:
 
     @pytest.mark.asyncio
     async def test_set_config_option_mode_invalid_returns_none(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -159,7 +159,7 @@ class TestACPSetConfigOptionMode:
 
     @pytest.mark.asyncio
     async def test_set_config_option_mode_empty_string_returns_none(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -182,7 +182,7 @@ class TestACPSetConfigOptionMode:
 class TestACPSetConfigOptionModel:
     @pytest.mark.asyncio
     async def test_set_config_option_model_success(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -210,7 +210,7 @@ class TestACPSetConfigOptionModel:
 
     @pytest.mark.asyncio
     async def test_set_config_option_model_invalid_returns_none(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -231,7 +231,7 @@ class TestACPSetConfigOptionModel:
 
     @pytest.mark.asyncio
     async def test_set_config_option_model_empty_string_returns_none(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -252,7 +252,7 @@ class TestACPSetConfigOptionModel:
 
     @pytest.mark.asyncio
     async def test_set_config_option_model_saves_to_config(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -269,7 +269,7 @@ class TestACPSetConfigOptionModel:
 
     @pytest.mark.asyncio
     async def test_set_config_option_model_does_not_save_on_invalid(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -288,7 +288,7 @@ class TestACPSetConfigOptionModel:
 class TestACPSetConfigOptionInvalidConfigId:
     @pytest.mark.asyncio
     async def test_set_config_option_invalid_config_id_returns_none(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -303,7 +303,7 @@ class TestACPSetConfigOptionInvalidConfigId:
 
     @pytest.mark.asyncio
     async def test_set_config_option_empty_config_id_returns_none(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]

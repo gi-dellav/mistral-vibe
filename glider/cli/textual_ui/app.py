@@ -737,6 +737,7 @@ class GliderApp(App):  # noqa: PLR0904
         import subprocess
 
         skill_name = ""
+        repo_url = ""
         if "frontend-design" in message.url:
             skill_name = "frontend-design"
             repo_url = "https://github.com/anthropics/skills"
@@ -1988,6 +1989,8 @@ args = ["-y", "@upstash/context7-mcp"] """,
                     self.query_one(ProxySetupApp).focus()
                 case BottomApp.Approval:
                     self.query_one(ApprovalApp).focus()
+                case BottomApp.AddModel:
+                    self.query_one(AddModelApp).focus()
                 case BottomApp.Question:
                     self.query_one(QuestionApp).focus()
                 case BottomApp.SessionPicker:

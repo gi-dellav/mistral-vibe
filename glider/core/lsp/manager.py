@@ -254,10 +254,10 @@ class LSPManager:
 
 _lsp_manager: LSPManager | None = None
 _lsp_manager_lock = threading.Lock()
-_lsp_config_getter: callable[[], LSPConfig] | None = None
+_lsp_config_getter: Callable[[], LSPConfig] | None = None
 
 
-def set_lsp_config_getter(getter: callable[[], LSPConfig]) -> None:
+def set_lsp_config_getter(getter: Callable[[], LSPConfig]) -> None:
     """Set a config getter function that returns LSPConfig from GliderConfig."""
     global _lsp_config_getter
     _lsp_config_getter = getter

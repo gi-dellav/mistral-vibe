@@ -16,7 +16,7 @@ from glider.core.tools.builtins.read_file import (
     ReadFileToolConfig,
 )
 from glider.core.trusted_folders import trusted_folders_manager
-from glider.core.utils import VIBE_WARNING_TAG
+from glider.core.utils import GLIDER_WARNING_TAG
 
 
 @pytest.fixture()
@@ -65,8 +65,8 @@ class TestGetResultExtra:
         )
         annotation = tool.get_result_extra(result)
         assert annotation is not None
-        assert f"<{VIBE_WARNING_TAG}>" in annotation
-        assert f"</{VIBE_WARNING_TAG}>" in annotation
+        assert f"<{GLIDER_WARNING_TAG}>" in annotation
+        assert f"</{GLIDER_WARNING_TAG}>" in annotation
         assert "# Sub instructions" in annotation
         assert "project instructions for this directory" in annotation
 

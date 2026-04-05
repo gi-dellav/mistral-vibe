@@ -5,7 +5,7 @@ import difflib
 from pathlib import Path
 import re
 import shutil
-from typing import ClassVar, NamedTuple, Optional, final
+from typing import TYPE_CHECKING, ClassVar, NamedTuple, Optional, final
 
 import anyio
 from pydantic import BaseModel, Field
@@ -32,6 +32,10 @@ try:
     LSP_AVAILABLE = True
 except ImportError:
     LSP_AVAILABLE = False
+
+if TYPE_CHECKING:
+    from glider.core.lsp import get_lsp_manager  # noqa: F401
+    from glider.core.lsp.config import PostEditDiagnosticsResult
 
 SEARCH_REPLACE_BLOCK_RE = re.compile(
     r"<{5,} SEARCH\r?\n(.*?)\r?\n?={5,}\r?\n(.*?)\r?\n?>{5,} REPLACE", flags=re.DOTALL
@@ -183,7 +187,7 @@ class SearchReplace(
             try:
                 lsp_manager = get_lsp_manager()
                 config = lsp_manager.config
-                
+
                 # Check if diagnostics after edit are enabled
                 if config.enabled and config.show_diagnostics_after_edit:
                     # Get diagnostics for the edited file

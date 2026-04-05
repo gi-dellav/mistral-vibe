@@ -10,7 +10,7 @@ import pytest
 from tests.acp.conftest import _create_acp_agent
 from tests.stubs.fake_backend import FakeBackend
 from tests.stubs.fake_client import FakeClient
-from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.acp.acp_agent_loop import GliderAcpAgentLoop
 from glider.core.agent_loop import AgentLoop
 from glider.core.types import LLMChunk, LLMMessage, LLMUsage, Role
 
@@ -31,7 +31,7 @@ def _make_response_chunk(content: str = "Hi") -> LLMChunk:
 
 
 @pytest.fixture
-def two_turn_acp_agent_loop() -> VibeAcpAgentLoop:
+def two_turn_acp_agent_loop() -> GliderAcpAgentLoop:
     backend = FakeBackend([
         [_make_response_chunk("Hi")],
         [_make_response_chunk("Hi again")],
@@ -48,7 +48,7 @@ def two_turn_acp_agent_loop() -> VibeAcpAgentLoop:
 class TestPromptResponseUserMessageId:
     @pytest.mark.asyncio
     async def test_generates_user_message_id_when_client_provides_none(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -64,7 +64,7 @@ class TestPromptResponseUserMessageId:
 
     @pytest.mark.asyncio
     async def test_echoes_client_provided_message_id(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -81,7 +81,7 @@ class TestPromptResponseUserMessageId:
 
     @pytest.mark.asyncio
     async def test_user_message_ids_are_unique_across_turns(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -102,7 +102,7 @@ class TestPromptResponseUserMessageId:
 class TestAgentMessageChunkMessageId:
     @pytest.mark.asyncio
     async def test_agent_message_chunk_has_message_id(
-        self, acp_agent_loop: VibeAcpAgentLoop
+        self, acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]
@@ -125,7 +125,7 @@ class TestAgentMessageChunkMessageId:
 
     @pytest.mark.asyncio
     async def test_agent_message_ids_are_unique_across_turns(
-        self, two_turn_acp_agent_loop: VibeAcpAgentLoop
+        self, two_turn_acp_agent_loop: GliderAcpAgentLoop
     ) -> None:
         session_response = await two_turn_acp_agent_loop.new_session(
             cwd=str(Path.cwd()), mcp_servers=[]

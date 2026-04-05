@@ -15,7 +15,7 @@ import pytest
 from tests.conftest import build_test_glider_config
 from tests.stubs.fake_backend import FakeBackend
 from tests.stubs.fake_client import FakeClient
-from glider.acp.acp_agent_loop import VibeAcpAgentLoop
+from glider.acp.acp_agent_loop import GliderAcpAgentLoop
 from glider.core.agent_loop import AgentLoop
 from glider.core.agents.models import BuiltinAgentName
 from glider.core.config import ModelConfig, SessionLoggingConfig
@@ -25,7 +25,7 @@ from glider.core.types import Role
 @pytest.fixture
 def acp_agent_with_session_config(
     backend: FakeBackend, temp_session_dir: Path, monkeypatch: pytest.MonkeyPatch
-) -> tuple[VibeAcpAgentLoop, FakeClient]:
+) -> tuple[GliderAcpAgentLoop, FakeClient]:
     session_config = SessionLoggingConfig(
         save_dir=str(temp_session_dir), session_prefix="session", enabled=True
     )
@@ -49,9 +49,9 @@ def acp_agent_with_session_config(
             self.agent_manager.invalidate_config()
 
     monkeypatch.setattr("vibe.acp.acp_agent_loop.AgentLoop", PatchedAgentLoop)
-    monkeypatch.setattr(VibeAcpAgentLoop, "_load_config", lambda self: config)
+    monkeypatch.setattr(GliderAcpAgentLoop, "_load_config", lambda self: config)
 
-    vibe_acp_agent = VibeAcpAgentLoop()
+    vibe_acp_agent = GliderAcpAgentLoop()
     client = FakeClient()
     vibe_acp_agent.on_connect(client)
     client.on_connect(vibe_acp_agent)
@@ -63,7 +63,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_load_session_response_structure(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
@@ -122,7 +122,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_load_session_registers_session_with_original_id(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
@@ -140,7 +140,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_load_session_injects_messages_into_agent_loop(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
@@ -167,7 +167,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_load_session_replays_user_messages(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
@@ -189,7 +189,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_load_session_replays_assistant_messages(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
@@ -216,7 +216,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_load_session_replays_tool_calls(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
@@ -263,7 +263,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_load_session_replays_reasoning_content(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
@@ -293,7 +293,7 @@ class TestLoadSession:
 
     @pytest.mark.asyncio
     async def test_load_session_not_found_raises_error(
-        self, acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient]
+        self, acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient]
     ) -> None:
         acp_agent, _client = acp_agent_with_session_config
 
@@ -305,7 +305,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_load_session_replays_full_conversation(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
@@ -342,7 +342,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_replay_user_message_has_message_id(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
@@ -365,7 +365,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_replay_agent_message_has_message_id(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
@@ -393,7 +393,7 @@ class TestLoadSession:
     @pytest.mark.asyncio
     async def test_replay_reasoning_has_different_message_id_than_agent_message(
         self,
-        acp_agent_with_session_config: tuple[VibeAcpAgentLoop, FakeClient],
+        acp_agent_with_session_config: tuple[GliderAcpAgentLoop, FakeClient],
         temp_session_dir: Path,
         create_test_session,
     ) -> None:
