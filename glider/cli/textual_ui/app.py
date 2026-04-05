@@ -1408,13 +1408,13 @@ class GliderApp(App):  # noqa: PLR0904
     async def on_add_model_app_cancelled(self, _event: AddModelApp.Cancelled) -> None:
         await self._switch_to_input_app()
 
-    async def _show_discover_mcp(self) -> None:
+    async def _show_discover_mcp(self, user_input: str) -> None:
         """Switch to the discover MCP picker in the bottom panel."""
         if self._current_bottom_app == BottomApp.DiscoverMCP:
             return
         await self._switch_to_discover_mcp_app()
 
-    async def _show_discover_skills(self) -> None:
+    async def _show_discover_skills(self, _: str) -> None:
         """Switch to the discover skills picker in the bottom panel."""
         if self._current_bottom_app == BottomApp.DiscoverSkills:
             return
