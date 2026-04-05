@@ -99,7 +99,7 @@ class AddModelApp(Vertical):
             temperature=0.2,
             input_price=0.0,
             output_price=0.0,
-            thinking="on",
+            thinking="off",
         )
 
         updates = {"models": [*self.config.models, model_config.model_dump()]}

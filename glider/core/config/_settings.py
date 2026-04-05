@@ -337,7 +337,7 @@ DEFAULT_MODELS = [
         alias="devstral-2",
         input_price=0.4,
         output_price=2.0,
-        thinking="low",
+        thinking="off",
     ),
     ModelConfig(
         name="devstral-small-latest",
@@ -345,7 +345,7 @@ DEFAULT_MODELS = [
         alias="devstral-small",
         input_price=0.1,
         output_price=0.3,
-        thinking="low",
+        thinking="off",
     ),
     ModelConfig(
         name="devstral",
@@ -353,7 +353,7 @@ DEFAULT_MODELS = [
         alias="local",
         input_price=0.0,
         output_price=0.0,
-        thinking="low",
+        thinking="off",
     ),
 ]
 
