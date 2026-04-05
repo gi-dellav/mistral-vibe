@@ -153,7 +153,7 @@ class TrustFolderApp(App):
         self._quit_without_saving = False
 
     def on_mount(self) -> None:
-        self.theme = "textual-ansi"
+        self.theme = "atom-one-light"
 
     def compose(self) -> ComposeResult:
         yield TrustFolderDialog(self.folder_path)

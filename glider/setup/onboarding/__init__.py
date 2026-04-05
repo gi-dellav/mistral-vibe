@@ -13,7 +13,7 @@ class OnboardingApp(App[str | None]):
     CSS_PATH = "onboarding.tcss"
 
     def on_mount(self) -> None:
-        self.theme = "textual-ansi"
+        self.theme = "atom-one-light"
 
         self.install_screen(WelcomeScreen(), "welcome")
         self.install_screen(ApiKeyScreen(), "api_key")
