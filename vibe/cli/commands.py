@@ -70,6 +70,16 @@ class CommandRegistry:
                 description="Display agent statistics",
                 handler="_show_status",
             ),
+            "lsp-status": Command(
+                aliases=frozenset(["/lsp-status"]),
+                description="Show LSP server status and connections",
+                handler="_show_lsp_status",
+            ),
+            "restart-lsp": Command(
+                aliases=frozenset(["/restart-lsp"]),
+                description="Restart all LSP servers",
+                handler="_restart_lsp",
+            ),
             "teleport": Command(
                 aliases=frozenset(["/teleport"]),
                 description="Teleport session to Vibe Nuage",

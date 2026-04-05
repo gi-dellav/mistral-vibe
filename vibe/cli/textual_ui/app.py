@@ -6,8 +6,8 @@ from enum import StrEnum, auto
 import gc
 import os
 from pathlib import Path
-import signal
 import shlex
+import signal
 import subprocess
 import time
 from typing import Any, ClassVar, assert_never, cast
@@ -1193,6 +1193,38 @@ class VibeApp(App):  # noqa: PLR0904
 - **Cost**: ${stats.session_cost:.4f}
 """
         await self._mount_and_scroll(UserCommandMessage(status_text))
+
+    async def _show_lsp_status(self) -> None:
+        from vibe.core.lsp.manager import get_lsp_manager
+
+        lsp_manager = get_lsp_manager()
+
+        lines = ["## LSP Status\n"]
+        lines.append(f"- **Enabled**: {lsp_manager.config.enabled}")
+        lines.append(f"- **Configured Servers**: {len(lsp_manager.config.servers)}")
+        lines.append(f"- **Active Servers**: {len(lsp_manager.servers)}")
+        lines.append("\n### Server Details:\n")
+
+        for server_id, server_config in lsp_manager.config.servers.items():
+            status = "disabled" if not server_config.enabled else "configured"
+            for server_key in lsp_manager.servers:
+                if server_key.startswith(f"{server_id}:"):
+                    status = "active"
+                    break
+            lines.append(f"- **{server_id}**: {status}")
+
+        await self._mount_and_scroll(UserCommandMessage("\n".join(lines)))
+
+    async def _restart_lsp(self) -> None:
+        from vibe.core.lsp.manager import get_lsp_manager
+
+        lsp_manager = get_lsp_manager()
+        await lsp_manager.shutdown()
+        await self._mount_and_scroll(
+            UserCommandMessage(
+                "## LSP Restarted\n\nAll LSP servers have been shut down and will be restarted on next use."
+            )
+        )
 
     async def _show_config(self) -> None:
         """Switch to the configuration app in the bottom panel."""

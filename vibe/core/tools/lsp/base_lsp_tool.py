@@ -38,8 +38,8 @@ class BaseLSPTool[ToolArgs: BaseModel, ToolResult: BaseModel](
         server = await self.lsp_manager.ensure_server_for_file(file_path)
         if server is None:
             raise ToolError(
-                f"No LSP server configured for this file type. "
-                f"Configure an LSP server in your settings to enable this feature."
+                "No LSP server configured for this file type. "
+                "Configure an LSP server in your settings to enable this feature."
             )
         return server
 
@@ -52,6 +52,11 @@ class BaseLSPTool[ToolArgs: BaseModel, ToolResult: BaseModel](
             )
         elif "timed out" in str(error):
             raise ToolError(f"{error_msg}. The operation took too long.")
+        elif "Connection" in str(error) or "connection" in str(error):
+            raise ToolError(
+                f"{error_msg}. LSP server connection lost. "
+                f"Try using /lsp-status to check server status, or /restart-lsp to restart the servers."
+            )
         else:
             raise ToolError(error_msg)
 
