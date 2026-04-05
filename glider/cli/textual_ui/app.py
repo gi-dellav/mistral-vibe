@@ -1880,7 +1880,7 @@ class GliderApp(App):  # noqa: PLR0904
         if self._current_bottom_app == BottomApp.DiscoverMCP:
             return
 
-        from vibe.cli.textual_ui.widgets.discover_mcp_app import (
+        from glider.cli.textual_ui.widgets.discover_mcp_app import (
             DiscoverMCPApp,
             MCPOption,
         )
@@ -1915,7 +1915,7 @@ args = ["-y", "@upstash/context7-mcp"] """,
         if self._current_bottom_app == BottomApp.DiscoverSkills:
             return
 
-        from vibe.cli.textual_ui.widgets.discover_skills_app import (
+        from glider.cli.textual_ui.widgets.discover_skills_app import (
             DiscoverSkillsApp,
             SkillOption,
         )
@@ -1996,6 +1996,10 @@ args = ["-y", "@upstash/context7-mcp"] """,
                     self.query_one(RewindApp).focus()
                 case BottomApp.Voice:
                     self.query_one(VoiceApp).focus()
+                case BottomApp.DiscoverMCP:
+                    self.query_one(DiscoverMCPApp).focus()
+                case BottomApp.DiscoverSkills:
+                    self.query_one(DiscoverSkillsApp).focus()
                 case app:
                     assert_never(app)
         except Exception:

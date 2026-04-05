@@ -11,7 +11,7 @@ from textual.message import Message
 from textual.widgets import OptionList
 from textual.widgets.option_list import Option
 
-from vibe.cli.textual_ui.widgets.no_markup_static import NoMarkupStatic
+from glider.cli.textual_ui.widgets.no_markup_static import NoMarkupStatic
 
 
 @dataclass
