@@ -35,7 +35,13 @@ class BaseLSPTool[ToolArgs: BaseModel, ToolResult: BaseModel](
 
     async def _ensure_server_running(self, file_path: str) -> Any:
         """Ensure LSP server is running for the given file."""
-        return await self.lsp_manager.ensure_server_for_file(file_path)
+        server = await self.lsp_manager.ensure_server_for_file(file_path)
+        if server is None:
+            raise ToolError(
+                f"No LSP server configured for this file type. "
+                f"Configure an LSP server in your settings to enable this feature."
+            )
+        return server
 
     async def _handle_lsp_error(self, error: Exception, context: str) -> None:
         """Handle LSP errors with appropriate user messaging."""

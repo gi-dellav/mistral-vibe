@@ -48,6 +48,7 @@ class LSPManager:
         self.servers: dict[str, LanguageServer] = {}
         self.workspace_roots: dict[str, Path] = {}
         self._lock = asyncio.Lock()
+        self._warned_languages: set[str] = set()
 
     def _get_language_for_file(self, file_path: str) -> str | None:
         """Get the language identifier for a file based on its extension."""
@@ -83,16 +84,29 @@ class LSPManager:
         self.workspace_roots[resolved_path] = file_path_obj.parent
         return file_path_obj.parent
 
-    async def ensure_server_for_file(self, file_path: str) -> LanguageServer:
-        """Ensure an LSP server is running for the given file."""
+    async def ensure_server_for_file(self, file_path: str) -> LanguageServer | None:
+        """Ensure an LSP server is running for the given file. Returns None if no server configured."""
         if not self.config.enabled:
-            raise RuntimeError("LSP support is disabled")
+            return None
 
         file_path = str(Path(file_path).resolve())
         language = self._get_language_for_file(file_path)
 
         if not language:
-            raise RuntimeError(f"No LSP server configured for file: {file_path}")
+            return None
+
+        if language not in self.config.servers:
+            if language not in self._warned_languages:
+                self._warned_languages.add(language)
+                logger.warning(
+                    f"No LSP server configured for language: {language}. "
+                    f"Configure an LSP server in your settings to enable diagnostics."
+                )
+            return None
+
+        server_config = self.config.servers[language]
+        if not server_config.enabled:
+            return None
 
         workspace_root = self._find_workspace_root(file_path)
         server_key = f"{language}:{workspace_root}"
@@ -112,55 +126,92 @@ class LSPManager:
     ) -> PostEditDiagnosticsResult:
         """Get diagnostics for a file after editing using LSP textDocument/diagnostic request."""
         try:
-            lsp = await self.ensure_server_for_file(file_path)
+            lsp = await asyncio.wait_for(
+                self.ensure_server_for_file(file_path),
+                timeout=self.config.request_timeout,
+            )
 
-            async with lsp.start_server():
-                text_document_uri = Path(file_path).as_uri()
-
-                params = {"textDocument": {"uri": text_document_uri}}
-                # multilspy's send method doesn't have typed params; LSP accepts dict
-                response = await lsp.server.send.text_document_diagnostic(params)  # type: ignore[arg-type]  # multilspy uses dynamic typing
-
-                diagnostics = self._parse_diagnostic_report(response, file_path)
-
-                has_errors = any(d.severity == "error" for d in diagnostics)
-                has_warnings = any(d.severity == "warning" for d in diagnostics)
-
-                error_count = sum(1 for d in diagnostics if d.severity == "error")
-                warning_count = sum(1 for d in diagnostics if d.severity == "warning")
-                info_count = sum(1 for d in diagnostics if d.severity == "info")
-                hint_count = sum(1 for d in diagnostics if d.severity == "hint")
-
-                summary_parts = []
-                if error_count > 0:
-                    summary_parts.append(
-                        f"{error_count} error{'s' if error_count != 1 else ''}"
-                    )
-                if warning_count > 0:
-                    summary_parts.append(
-                        f"{warning_count} warning{'s' if warning_count != 1 else ''}"
-                    )
-                if info_count > 0:
-                    summary_parts.append(
-                        f"{info_count} info item{'s' if info_count != 1 else ''}"
-                    )
-                if hint_count > 0:
-                    summary_parts.append(
-                        f"{hint_count} hint{'s' if hint_count != 1 else ''}"
-                    )
-
-                if summary_parts:
-                    summary = "LSP found: " + ", ".join(summary_parts)
-                else:
-                    summary = "No LSP diagnostics found"
-
+            if lsp is None:
                 return PostEditDiagnosticsResult(
-                    diagnostics=diagnostics,
-                    has_errors=has_errors,
-                    has_warnings=has_warnings,
-                    summary=summary,
+                    diagnostics=[],
+                    has_errors=False,
+                    has_warnings=False,
+                    summary="No LSP server configured for this file type",
                 )
 
+            async with asyncio.timeout(self.config.request_timeout):
+                async with lsp.start_server():
+                    text_document_uri = Path(file_path).as_uri()
+
+                    params = {"textDocument": {"uri": text_document_uri}}
+                    try:
+                        response = await asyncio.wait_for(
+                            lsp.server.send.text_document_diagnostic(params),  # type: ignore[arg-type]
+                            timeout=self.config.request_timeout,
+                        )
+                    except asyncio.TimeoutError:
+                        logger.warning(
+                            f"LSP diagnostics request timed out for {file_path}"
+                        )
+                        return PostEditDiagnosticsResult(
+                            diagnostics=[],
+                            has_errors=False,
+                            has_warnings=False,
+                            summary="Diagnostics request timed out",
+                        )
+
+                    diagnostics = self._parse_diagnostic_report(response, file_path)
+
+                    has_errors = any(d.severity == "error" for d in diagnostics)
+                    has_warnings = any(d.severity == "warning" for d in diagnostics)
+
+                    error_count = sum(1 for d in diagnostics if d.severity == "error")
+                    warning_count = sum(
+                        1 for d in diagnostics if d.severity == "warning"
+                    )
+                    info_count = sum(1 for d in diagnostics if d.severity == "info")
+                    hint_count = sum(1 for d in diagnostics if d.severity == "hint")
+
+                    summary_parts = []
+                    if error_count > 0:
+                        summary_parts.append(
+                            f"{error_count} error{'s' if error_count != 1 else ''}"
+                        )
+                    if warning_count > 0:
+                        summary_parts.append(
+                            f"{warning_count} warning{'s' if warning_count != 1 else ''}"
+                        )
+                    if info_count > 0:
+                        summary_parts.append(
+                            f"{info_count} info item{'s' if info_count != 1 else ''}"
+                        )
+                    if hint_count > 0:
+                        summary_parts.append(
+                            f"{hint_count} hint{'s' if hint_count != 1 else ''}"
+                        )
+
+                    if summary_parts:
+                        summary = "LSP found: " + ", ".join(summary_parts)
+                    else:
+                        summary = "No LSP diagnostics found"
+
+                    return PostEditDiagnosticsResult(
+                        diagnostics=diagnostics,
+                        has_errors=has_errors,
+                        has_warnings=has_warnings,
+                        summary=summary,
+                    )
+
+        except asyncio.TimeoutError:
+            logger.warning(
+                f"LSP operation timed out for {file_path} after {self.config.request_timeout}s"
+            )
+            return PostEditDiagnosticsResult(
+                diagnostics=[],
+                has_errors=False,
+                has_warnings=False,
+                summary=f"LSP operation timed out after {self.config.request_timeout}s",
+            )
         except Exception as e:
             logger.warning(f"Failed to get diagnostics for {file_path}: {e}")
             return PostEditDiagnosticsResult(

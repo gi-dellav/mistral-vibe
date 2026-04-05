@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncGenerator
 import difflib
 from pathlib import Path
@@ -29,6 +30,7 @@ from vibe.core.logger import logger
 try:
     from vibe.core.lsp import get_lsp_manager
     from vibe.core.lsp.config import PostEditDiagnosticsResult
+
     LSP_AVAILABLE = True
 except ImportError:
     LSP_AVAILABLE = False
@@ -183,11 +185,20 @@ class SearchReplace(
             try:
                 lsp_manager = get_lsp_manager()
                 config = lsp_manager.config
-                
+
                 # Check if diagnostics after edit are enabled
                 if config.enabled and config.show_diagnostics_after_edit:
-                    # Get diagnostics for the edited file
-                    lsp_diagnostics_result = await lsp_manager.get_diagnostics_for_file(str(file_path))
+                    # Get diagnostics for the edited file with a timeout to prevent hanging
+                    try:
+                        lsp_diagnostics_result = await asyncio.wait_for(
+                            lsp_manager.get_diagnostics_for_file(str(file_path)),
+                            timeout=10,
+                        )
+                    except asyncio.TimeoutError:
+                        logger.warning(
+                            f"LSP diagnostics timed out after 10s for {file_path}"
+                        )
+                        lsp_diagnostics_result = None
             except Exception as e:
                 # Don't let LSP errors break the edit operation
                 logger.warning(f"Failed to get LSP diagnostics after edit: {e}")
