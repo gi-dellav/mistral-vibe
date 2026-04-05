@@ -56,6 +56,8 @@ from vibe.cli.textual_ui.widgets.chat_input.text_area import ChatTextArea
 from vibe.cli.textual_ui.widgets.compact import CompactMessage
 from vibe.cli.textual_ui.widgets.config_app import ConfigApp
 from vibe.cli.textual_ui.widgets.context_progress import ContextProgress, TokenState
+from vibe.cli.textual_ui.widgets.discover_mcp_app import DiscoverMCPApp
+from vibe.cli.textual_ui.widgets.discover_skills_app import DiscoverSkillsApp
 from vibe.cli.textual_ui.widgets.feedback_bar import FeedbackBar
 from vibe.cli.textual_ui.widgets.load_more import HistoryLoadMoreRequested
 from vibe.cli.textual_ui.widgets.loading import LoadingWidget, paused_timer
@@ -177,6 +179,8 @@ class BottomApp(StrEnum):
     Rewind = auto()
     SessionPicker = auto()
     Voice = auto()
+    DiscoverMCP = auto()
+    DiscoverSkills = auto()
 
 
 class ChatScroll(VerticalScroll):
@@ -679,6 +683,176 @@ class VibeApp(App):  # noqa: PLR0904
         else:
             await self._mount_and_scroll(UserCommandMessage("Proxy setup cancelled."))
 
+    async def on_discover_mcp_app_mcp_selected(
+        self, message: DiscoverMCPApp.MCPSelected
+    ) -> None:
+        config_path = Path.cwd() / ".vibe" / "config.toml"
+        if config_path.exists():
+            current_content = config_path.read_text()
+        else:
+            current_content = ""
+
+        mcp_name = ""
+        for line in message.config_snippet.split("\n"):
+            if line.startswith("name = "):
+                mcp_name = line.split("=")[1].strip().strip('"')
+                break
+
+        if mcp_name in {srv.name for srv in self.config.mcp_servers}:
+            await self._mount_and_scroll(
+                UserCommandMessage(
+                    f"MCP server '{mcp_name}' is already enabled in config."
+                )
+            )
+            await self._switch_to_input_app()
+            return
+
+        if message.config_snippet in current_content:
+            await self._mount_and_scroll(
+                UserCommandMessage("MCP server already configured in config.")
+            )
+        else:
+            new_content = current_content.rstrip() + "\n\n" + message.config_snippet
+            config_path.parent.mkdir(parents=True, exist_ok=True)
+            config_path.write_text(new_content)
+            await self._mount_and_scroll(
+                UserCommandMessage(
+                    f"MCP server '{mcp_name}' added to config. Run /reload to enable it."
+                )
+            )
+        await self._switch_to_input_app()
+
+    async def on_discover_mcp_app_cancelled(
+        self, _event: DiscoverMCPApp.Cancelled
+    ) -> None:
+        await self._switch_to_input_app()
+
+    async def on_discover_skills_app_skill_selected(
+        self, message: DiscoverSkillsApp.SkillSelected
+    ) -> None:
+        import re
+        import subprocess
+
+        skill_name = ""
+        if "frontend-design" in message.url:
+            skill_name = "frontend-design"
+            repo_url = "https://github.com/anthropics/skills"
+        elif "superpowers" in message.url:
+            skill_name = "superpowers"
+            repo_url = "https://github.com/obra/superpowers"
+
+        if not skill_name:
+            await self._mount_and_scroll(
+                UserCommandMessage(f"Unknown skill URL: {message.url}")
+            )
+            await self._switch_to_input_app()
+            return
+
+        if skill_name in self.config.enabled_skills:
+            await self._mount_and_scroll(
+                UserCommandMessage(
+                    f"Skill '{skill_name}' is already enabled in config."
+                )
+            )
+            await self._switch_to_input_app()
+            return
+
+        skills_dir = Path.cwd() / ".vibe" / "skills"
+        skill_dir = skills_dir / skill_name
+
+        if skill_dir.exists():
+            if skill_name not in self.config.enabled_skills:
+                config_path = Path.cwd() / ".vibe" / "config.toml"
+                config_content = config_path.read_text() if config_path.exists() else ""
+                enabled_match = re.search(
+                    r"enabled_skills\s*=\s*\[(.*?)\]", config_content
+                )
+                if enabled_match:
+                    new_enabled = enabled_match.group(1).rstrip() + f', "{skill_name}"'
+                    config_content = config_content.replace(
+                        enabled_match.group(0), f"enabled_skills = [{new_enabled}]"
+                    )
+                else:
+                    config_content = (
+                        config_content.rstrip()
+                        + f'\nenabled_skills = ["{skill_name}"]\n'
+                    )
+                config_path.write_text(config_content)
+                await self._mount_and_scroll(
+                    UserCommandMessage(
+                        f"Skill '{skill_name}' added to enabled_skills in config.\n"
+                        "Run /reload to enable it."
+                    )
+                )
+            else:
+                await self._mount_and_scroll(
+                    UserCommandMessage(
+                        f"Skill '{skill_name}' already installed and enabled."
+                    )
+                )
+            await self._switch_to_input_app()
+            return
+
+        try:
+            skills_dir.mkdir(parents=True, exist_ok=True)
+            result = subprocess.run(
+                ["git", "clone", "--depth", "1", repo_url, str(skill_dir)],
+                capture_output=True,
+                text=True,
+                cwd=str(skills_dir.parent),
+            )
+            if result.returncode != 0:
+                await self._mount_and_scroll(
+                    ErrorMessage(f"Failed to clone skill: {result.stderr}")
+                )
+                await self._switch_to_input_app()
+                return
+
+            if skill_name == "superpowers":
+                (skill_dir / ".git").rename(skill_dir / ".git.bak")
+
+            config_path = Path.cwd() / ".vibe" / "config.toml"
+            config_content = config_path.read_text() if config_path.exists() else ""
+
+            updates = []
+            if "skill_paths" not in config_content:
+                updates.append('skill_paths = [".vibe/skills"]')
+            if "enabled_skills" not in config_content:
+                updates.append(f'enabled_skills = ["{skill_name}"]')
+            else:
+                enabled_match = re.search(
+                    r"enabled_skills\s*=\s*\[(.*?)\]", config_content
+                )
+                if enabled_match:
+                    new_enabled = enabled_match.group(1).rstrip() + f', "{skill_name}"'
+                    config_content = config_content.replace(
+                        enabled_match.group(0), f"enabled_skills = [{new_enabled}]"
+                    )
+                    updates = []
+
+            if updates:
+                new_config = (
+                    config_content.rstrip() + "\n\n" + "\n".join(updates) + "\n"
+                )
+            else:
+                new_config = config_content
+
+            config_path.parent.mkdir(parents=True, exist_ok=True)
+            config_path.write_text(new_config)
+
+            await self._mount_and_scroll(
+                UserCommandMessage(
+                    f"Skill '{skill_name}' installed to {skill_dir}.\n"
+                    "Run /reload to enable it."
+                )
+            )
+        except Exception as e:
+            await self._mount_and_scroll(ErrorMessage(f"Error installing skill: {e}"))
+        await self._switch_to_input_app()
+
+    async def on_discover_skills_app_cancelled(
+        self, _event: DiscoverSkillsApp.Cancelled
+    ) -> None:
         await self._switch_to_input_app()
 
     async def on_compact_message_completed(
@@ -1209,6 +1383,18 @@ class VibeApp(App):  # noqa: PLR0904
     async def _show_data_retention(self) -> None:
         await self._mount_and_scroll(UserCommandMessage(DATA_RETENTION_MESSAGE))
 
+    async def _show_discover_mcp(self) -> None:
+        """Switch to the discover MCP picker in the bottom panel."""
+        if self._current_bottom_app == BottomApp.DiscoverMCP:
+            return
+        await self._switch_to_discover_mcp_app()
+
+    async def _show_discover_skills(self) -> None:
+        """Switch to the discover skills picker in the bottom panel."""
+        if self._current_bottom_app == BottomApp.DiscoverSkills:
+            return
+        await self._switch_to_discover_skills_app()
+
     async def _show_session_picker(self) -> None:
         cwd = str(Path.cwd())
         local_sessions = (
@@ -1665,6 +1851,68 @@ class VibeApp(App):  # noqa: PLR0904
 
         await self._mount_and_scroll(UserCommandMessage("Proxy setup opened..."))
         await self._switch_from_input(ProxySetupApp())
+
+    async def _switch_to_discover_mcp_app(self) -> None:
+        if self._current_bottom_app == BottomApp.DiscoverMCP:
+            return
+
+        from vibe.cli.textual_ui.widgets.discover_mcp_app import (
+            DiscoverMCPApp,
+            MCPOption,
+        )
+
+        enabled_mcp_names = {srv.name for srv in self.config.mcp_servers}
+        discover_options = [
+            MCPOption(
+                name="context7",
+                description="Up-to-date code documentation for LLMs",
+                config_snippet="""[[mcp_servers]]
+name = "context7"
+transport = "streamable-http"
+url = "https://mcp.context7.com/mcp"
+api_key_env = "CONTEXT7_API_KEY" """,
+            ),
+            MCPOption(
+                name="context7-local",
+                description="Up-to-date code documentation (local npx)",
+                config_snippet="""[[mcp_servers]]
+name = "context7-local"
+transport = "stdio"
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"] """,
+            ),
+        ]
+        await self._mount_and_scroll(UserCommandMessage("Discover MCP servers..."))
+        await self._switch_from_input(
+            DiscoverMCPApp(options=discover_options, enabled_names=enabled_mcp_names)
+        )
+
+    async def _switch_to_discover_skills_app(self) -> None:
+        if self._current_bottom_app == BottomApp.DiscoverSkills:
+            return
+
+        from vibe.cli.textual_ui.widgets.discover_skills_app import (
+            DiscoverSkillsApp,
+            SkillOption,
+        )
+
+        enabled_skills = set(self.config.enabled_skills)
+        discover_options = [
+            SkillOption(
+                name="frontend-design",
+                description="Frontend design best practices",
+                url="https://github.com/anthropics/skills/tree/main/skills/frontend-design",
+            ),
+            SkillOption(
+                name="superpowers",
+                description="Agentic skills framework & software development methodology",
+                url="https://github.com/obra/superpowers/tree/main/skills",
+            ),
+        ]
+        await self._mount_and_scroll(UserCommandMessage("Discover skills..."))
+        await self._switch_from_input(
+            DiscoverSkillsApp(options=discover_options, enabled_names=enabled_skills)
+        )
 
     async def _switch_to_approval_app(
         self,

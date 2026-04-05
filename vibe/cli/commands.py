@@ -110,6 +110,16 @@ class CommandRegistry:
                 description="Show data retention information",
                 handler="_show_data_retention",
             ),
+            "discover-mcp": Command(
+                aliases=frozenset(["/discover-mcp"]),
+                description="Discover and enable MCP servers",
+                handler="_show_discover_mcp",
+            ),
+            "discover-skills": Command(
+                aliases=frozenset(["/discover-skills"]),
+                description="Discover and enable skills",
+                handler="_show_discover_skills",
+            ),
         }
 
         for command in excluded_commands:
