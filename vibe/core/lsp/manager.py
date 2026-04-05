@@ -301,6 +301,8 @@ class LSPManager:
                 except Exception as e:
                     logger.warning(f"Error stopping LSP server: {e}")
             self.servers.clear()
+            self.workspace_roots.clear()
+            self._warned_languages.clear()
 
 
 _lsp_manager: LSPManager | None = None

@@ -1194,28 +1194,29 @@ class VibeApp(App):  # noqa: PLR0904
 """
         await self._mount_and_scroll(UserCommandMessage(status_text))
 
-    async def _show_lsp_status(self) -> None:
+    async def _show_lsp_status(self, user_input: str) -> None:
         from vibe.core.lsp.manager import get_lsp_manager
 
         lsp_manager = get_lsp_manager()
 
+        active_servers = lsp_manager.servers or {}
         lines = ["## LSP Status\n"]
         lines.append(f"- **Enabled**: {lsp_manager.config.enabled}")
         lines.append(f"- **Configured Servers**: {len(lsp_manager.config.servers)}")
-        lines.append(f"- **Active Servers**: {len(lsp_manager.servers)}")
+        lines.append(f"- **Active Servers**: {len(active_servers)}")
         lines.append("\n### Server Details:\n")
 
         for server_id, server_config in lsp_manager.config.servers.items():
             status = "disabled" if not server_config.enabled else "configured"
-            for server_key in lsp_manager.servers:
-                if server_key.startswith(f"{server_id}:"):
-                    status = "active"
-                    break
+            if any(
+                server_key.startswith(f"{server_id}:") for server_key in active_servers
+            ):
+                status = "active"
             lines.append(f"- **{server_id}**: {status}")
 
         await self._mount_and_scroll(UserCommandMessage("\n".join(lines)))
 
-    async def _restart_lsp(self) -> None:
+    async def _restart_lsp(self, user_input: str) -> None:
         from vibe.core.lsp.manager import get_lsp_manager
 
         lsp_manager = get_lsp_manager()

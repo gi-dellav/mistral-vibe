@@ -99,7 +99,9 @@ class WorkspaceSymbols(BaseLSPTool[WorkspaceSymbolsArgs, WorkspaceSymbolsResult]
             params = {"query": args.query}
 
             async with server_process.start_server():
-                response = await server_process.request("workspace/symbol", params)
+                response = await self._request_with_timeout(
+                    server_process, "workspace/symbol", params
+                )
 
             if not response or not isinstance(response, list):
                 yield WorkspaceSymbolsResult(

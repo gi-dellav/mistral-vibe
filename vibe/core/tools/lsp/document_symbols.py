@@ -92,8 +92,8 @@ class DocumentSymbols(BaseLSPTool[DocumentSymbolsArgs, DocumentSymbolsResult]):
             params = self._create_text_document_params(args.file_path)
 
             async with server_process.start_server():
-                response = await server_process.request(
-                    "textDocument/documentSymbol", params
+                response = await self._request_with_timeout(
+                    server_process, "textDocument/documentSymbol", params
                 )
 
             if not response or not isinstance(response, list):

@@ -7,6 +7,7 @@ from typing import Any, ClassVar
 
 from pydantic import BaseModel
 
+from vibe.core.logger import logger
 from vibe.core.tools.base import BaseTool, BaseToolConfig, BaseToolState, ToolError
 
 
@@ -42,6 +43,67 @@ class BaseLSPTool[ToolArgs: BaseModel, ToolResult: BaseModel](
                 "Configure an LSP server in your settings to enable this feature."
             )
         return server
+
+    async def _request_with_timeout(
+        self, server_process: Any, method: str, params: dict[str, Any]
+    ) -> Any:
+        """Send LSP request with timeout."""
+        timeout = self.lsp_manager.config.request_timeout
+        try:
+            return await asyncio.wait_for(
+                server_process.request(method, params), timeout=timeout
+            )
+        except asyncio.TimeoutError:
+            raise ToolError(
+                f"LSP request '{method}' timed out after {timeout}s. "
+                "The LSP server may be unresponsive. Try /restart-lsp to restart servers."
+            )
+
+    async def _request_with_retry(
+        self,
+        server_process: Any,
+        method: str,
+        params: dict[str, Any],
+        max_retries: int | None = None,
+    ) -> Any:
+        """Send LSP request with retry logic."""
+        if max_retries is None:
+            max_retries = self.lsp_manager.config.max_retries
+
+        last_error: Exception | None = None
+        for attempt in range(max_retries + 1):
+            try:
+                return await self._request_with_timeout(server_process, method, params)
+            except ToolError as e:
+                last_error = e
+                if attempt < max_retries:
+                    wait_time = 0.5 * (2**attempt)
+                    logger.warning(
+                        f"LSP request '{method}' failed (attempt {attempt + 1}/{max_retries + 1}): {e!s}. "
+                        f"Retrying in {wait_time}s..."
+                    )
+                    await asyncio.sleep(wait_time)
+                else:
+                    logger.warning(
+                        f"LSP request '{method}' failed after {max_retries + 1} attempts: {e!s}"
+                    )
+            except Exception as e:
+                last_error = e
+                if attempt < max_retries:
+                    wait_time = 0.5 * (2**attempt)
+                    logger.warning(
+                        f"LSP request '{method}' error (attempt {attempt + 1}/{max_retries + 1}): {e!s}. "
+                        f"Retrying in {wait_time}s..."
+                    )
+                    await asyncio.sleep(wait_time)
+
+        if last_error:
+            raise ToolError(
+                f"LSP request '{method}' failed after {max_retries + 1} attempts: {last_error!s}"
+            )
+        raise ToolError(
+            f"LSP request '{method}' failed after {max_retries + 1} attempts"
+        )
 
     async def _handle_lsp_error(self, error: Exception, context: str) -> None:
         """Handle LSP errors with appropriate user messaging."""

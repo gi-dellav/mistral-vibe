@@ -65,65 +65,65 @@ class CallHierarchy(BaseLSPTool[CallHierarchyArgs, CallHierarchyResult]):
             )
 
             async with server_process.start_server():
-                prepare_response = await server_process.request(
-                    "textDocument/prepareCallHierarchy", prepare_params
+                prepare_response = await self._request_with_timeout(
+                    server_process, "textDocument/prepareCallHierarchy", prepare_params
                 )
 
-            if not prepare_response:
+                if not prepare_response:
+                    yield CallHierarchyResult(
+                        symbol_name="",
+                        file_path=args.file_path,
+                        line=args.line,
+                        character=args.character,
+                        incoming=[],
+                        outgoing=[],
+                        has_calls=False,
+                    )
+                    return
+
+                items = []
+                if isinstance(prepare_response, list):
+                    items = prepare_response
+                elif isinstance(prepare_response, dict):
+                    items = [prepare_response]
+
+                if not items:
+                    yield CallHierarchyResult(
+                        symbol_name="",
+                        file_path=args.file_path,
+                        line=args.line,
+                        character=args.character,
+                        incoming=[],
+                        outgoing=[],
+                        has_calls=False,
+                    )
+                    return
+
+                primary_item = items[0]
+                symbol_name = primary_item.get("name", "")
+
+                incoming = []
+                outgoing = []
+
+                if args.direction in {"incoming", "both"}:
+                    incoming = await self._get_incoming_calls(
+                        server_process, primary_item, args.context_lines
+                    )
+
+                if args.direction in {"outgoing", "both"}:
+                    outgoing = await self._get_outgoing_calls(
+                        server_process, primary_item, args.context_lines
+                    )
+
                 yield CallHierarchyResult(
-                    symbol_name="",
+                    symbol_name=symbol_name,
                     file_path=args.file_path,
                     line=args.line,
                     character=args.character,
-                    incoming=[],
-                    outgoing=[],
-                    has_calls=False,
+                    incoming=incoming,
+                    outgoing=outgoing,
+                    has_calls=len(incoming) > 0 or len(outgoing) > 0,
                 )
-                return
-
-            items = []
-            if isinstance(prepare_response, list):
-                items = prepare_response
-            elif isinstance(prepare_response, dict):
-                items = [prepare_response]
-
-            if not items:
-                yield CallHierarchyResult(
-                    symbol_name="",
-                    file_path=args.file_path,
-                    line=args.line,
-                    character=args.character,
-                    incoming=[],
-                    outgoing=[],
-                    has_calls=False,
-                )
-                return
-
-            primary_item = items[0]
-            symbol_name = primary_item.get("name", "")
-
-            incoming = []
-            outgoing = []
-
-            if args.direction in {"incoming", "both"}:
-                incoming = await self._get_incoming_calls(
-                    server_process, primary_item, args.context_lines
-                )
-
-            if args.direction in {"outgoing", "both"}:
-                outgoing = await self._get_outgoing_calls(
-                    server_process, primary_item, args.context_lines
-                )
-
-            yield CallHierarchyResult(
-                symbol_name=symbol_name,
-                file_path=args.file_path,
-                line=args.line,
-                character=args.character,
-                incoming=incoming,
-                outgoing=outgoing,
-                has_calls=len(incoming) > 0 or len(outgoing) > 0,
-            )
 
         except ToolError:
             raise
@@ -136,10 +136,9 @@ class CallHierarchy(BaseLSPTool[CallHierarchyArgs, CallHierarchyResult]):
         """Get incoming calls (functions that call this function)."""
         try:
             params = {"item": item}
-            async with server_process.start_server():
-                response = await server_process.request(
-                    "callHierarchy/incomingCalls", params
-                )
+            response = await self._request_with_timeout(
+                server_process, "callHierarchy/incomingCalls", params
+            )
 
             return await self._parse_call_locations(response, context_lines, "incoming")
         except Exception:
@@ -151,10 +150,9 @@ class CallHierarchy(BaseLSPTool[CallHierarchyArgs, CallHierarchyResult]):
         """Get outgoing calls (functions called by this function)."""
         try:
             params = {"item": item}
-            async with server_process.start_server():
-                response = await server_process.request(
-                    "callHierarchy/outgoingCalls", params
-                )
+            response = await self._request_with_timeout(
+                server_process, "callHierarchy/outgoingCalls", params
+            )
 
             return await self._parse_call_locations(response, context_lines, "outgoing")
         except Exception:

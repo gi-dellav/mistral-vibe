@@ -43,7 +43,7 @@ class LSPConfig(BaseModel):
         default=True, description="Show LSP diagnostics automatically after file edits"
     )
     max_retries: int = Field(
-        default=1, description="Maximum number of retries for failed LSP requests"
+        default=3, description="Maximum number of retries for failed LSP requests"
     )
     request_timeout: int = Field(
         default=30, description="Timeout for LSP requests in seconds"

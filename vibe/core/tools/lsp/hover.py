@@ -43,7 +43,9 @@ class Hover(BaseLSPTool[HoverArgs, HoverResult]):
             )
 
             async with server_process.start_server():
-                response = await server_process.request("textDocument/hover", params)
+                response = await self._request_with_timeout(
+                    server_process, "textDocument/hover", params
+                )
 
             if not response:
                 yield HoverResult(

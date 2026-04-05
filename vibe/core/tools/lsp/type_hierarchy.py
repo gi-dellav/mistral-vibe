@@ -68,65 +68,65 @@ class TypeHierarchy(BaseLSPTool[TypeHierarchyArgs, TypeHierarchyResult]):
             )
 
             async with server_process.start_server():
-                prepare_response = await server_process.request(
-                    "typeHierarchy/prepare", params
+                prepare_response = await self._request_with_timeout(
+                    server_process, "typeHierarchy/prepare", params
                 )
 
-            if not prepare_response:
+                if not prepare_response:
+                    yield TypeHierarchyResult(
+                        symbol_name="",
+                        file_path=args.file_path,
+                        line=args.line,
+                        character=args.character,
+                        supertypes=[],
+                        subtypes=[],
+                        has_hierarchy=False,
+                    )
+                    return
+
+                items = []
+                if isinstance(prepare_response, list):
+                    items = prepare_response
+                elif isinstance(prepare_response, dict):
+                    items = [prepare_response]
+
+                if not items:
+                    yield TypeHierarchyResult(
+                        symbol_name="",
+                        file_path=args.file_path,
+                        line=args.line,
+                        character=args.character,
+                        supertypes=[],
+                        subtypes=[],
+                        has_hierarchy=False,
+                    )
+                    return
+
+                primary_item = items[0]
+                symbol_name = primary_item.get("name", "")
+
+                supertypes = []
+                subtypes = []
+
+                if args.direction in {"supertypes", "both"}:
+                    supertypes = await self._get_supertypes(
+                        server_process, primary_item, args.context_lines
+                    )
+
+                if args.direction in {"subtypes", "both"}:
+                    subtypes = await self._get_subtypes(
+                        server_process, primary_item, args.context_lines
+                    )
+
                 yield TypeHierarchyResult(
-                    symbol_name="",
+                    symbol_name=symbol_name,
                     file_path=args.file_path,
                     line=args.line,
                     character=args.character,
-                    supertypes=[],
-                    subtypes=[],
-                    has_hierarchy=False,
+                    supertypes=supertypes,
+                    subtypes=subtypes,
+                    has_hierarchy=len(supertypes) > 0 or len(subtypes) > 0,
                 )
-                return
-
-            items = []
-            if isinstance(prepare_response, list):
-                items = prepare_response
-            elif isinstance(prepare_response, dict):
-                items = [prepare_response]
-
-            if not items:
-                yield TypeHierarchyResult(
-                    symbol_name="",
-                    file_path=args.file_path,
-                    line=args.line,
-                    character=args.character,
-                    supertypes=[],
-                    subtypes=[],
-                    has_hierarchy=False,
-                )
-                return
-
-            primary_item = items[0]
-            symbol_name = primary_item.get("name", "")
-
-            supertypes = []
-            subtypes = []
-
-            if args.direction in {"supertypes", "both"}:
-                supertypes = await self._get_supertypes(
-                    server_process, primary_item, args.context_lines
-                )
-
-            if args.direction in {"subtypes", "both"}:
-                subtypes = await self._get_subtypes(
-                    server_process, primary_item, args.context_lines
-                )
-
-            yield TypeHierarchyResult(
-                symbol_name=symbol_name,
-                file_path=args.file_path,
-                line=args.line,
-                character=args.character,
-                supertypes=supertypes,
-                subtypes=subtypes,
-                has_hierarchy=len(supertypes) > 0 or len(subtypes) > 0,
-            )
 
         except ToolError:
             raise
@@ -139,8 +139,9 @@ class TypeHierarchy(BaseLSPTool[TypeHierarchyArgs, TypeHierarchyResult]):
         """Get supertypes (parent types) for a type hierarchy item."""
         try:
             params = {"item": item}
-            async with server_process.start_server():
-                response = await server_process.request("typeHierarchy/supertypes", params)
+            response = await self._request_with_timeout(
+                server_process, "typeHierarchy/supertypes", params
+            )
 
             return await self._parse_hierarchy_items(response, context_lines)
         except Exception:
@@ -152,8 +153,9 @@ class TypeHierarchy(BaseLSPTool[TypeHierarchyArgs, TypeHierarchyResult]):
         """Get subtypes (child types) for a type hierarchy item."""
         try:
             params = {"item": item}
-            async with server_process.start_server():
-                response = await server_process.request("typeHierarchy/subtypes", params)
+            response = await self._request_with_timeout(
+                server_process, "typeHierarchy/subtypes", params
+            )
 
             return await self._parse_hierarchy_items(response, context_lines)
         except Exception:

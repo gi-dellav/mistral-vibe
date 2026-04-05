@@ -64,8 +64,8 @@ class SignatureHelp(BaseLSPTool[SignatureHelpArgs, SignatureHelpResult]):
             )
 
             async with server_process.start_server():
-                response = await server_process.request(
-                    "textDocument/signatureHelp", params
+                response = await self._request_with_timeout(
+                    server_process, "textDocument/signatureHelp", params
                 )
 
             if not response:

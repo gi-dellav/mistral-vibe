@@ -64,7 +64,9 @@ class FindReferences(BaseLSPTool[FindReferencesArgs, FindReferencesResult]):
             }
 
             async with server_process.start_server():
-                response = await server_process.request("textDocument/references", params)
+                response = await self._request_with_timeout(
+                    server_process, "textDocument/references", params
+                )
 
             if not response or not isinstance(response, list):
                 raise ToolError(

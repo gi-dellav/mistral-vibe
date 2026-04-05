@@ -47,7 +47,9 @@ class GoToDefinition(BaseLSPTool[GoToDefinitionArgs, GoToDefinitionResult]):
             )
 
             async with server_process.start_server():
-                response = await server_process.request("textDocument/definition", params)
+                response = await self._request_with_timeout(
+                    server_process, "textDocument/definition", params
+                )
 
             if not response:
                 raise ToolError(
